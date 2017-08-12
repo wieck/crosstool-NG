@@ -1,7 +1,7 @@
-From bf5d60c26c78dc7643c0cfc43ddbb2825d440ddd Mon Sep 17 00:00:00 2001
+From c4a7c414b80767a8490e3cffffd97dfa77209285 Mon Sep 17 00:00:00 2001
 From: jcmvbkbc <jcmvbkbc@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Tue, 1 Nov 2016 17:16:33 +0000
-Subject: [PATCH 4/6] xtensa: Fix PR target/78118
+Subject: [PATCH 4/9] xtensa: Fix PR target/78118
 
 It started failing after the following commit: 32e90dc6a0cda45 ("PR
 rtl-optimization/61047").
@@ -59,7 +59,7 @@ Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
  4 files changed, 55 insertions(+), 36 deletions(-)
 
 diff --git a/gcc/config/xtensa/xtensa-protos.h b/gcc/config/xtensa/xtensa-protos.h
-index 6a53625..1ca1384 100644
+index 6a5362547d5..1ca1384b3e0 100644
 --- a/gcc/config/xtensa/xtensa-protos.h
 +++ b/gcc/config/xtensa/xtensa-protos.h
 @@ -68,6 +68,7 @@ extern rtx xtensa_return_addr (int, rtx);
@@ -71,7 +71,7 @@ index 6a53625..1ca1384 100644
  extern void xtensa_expand_epilogue (void);
  extern void order_regs_for_local_alloc (void);
 diff --git a/gcc/config/xtensa/xtensa.c b/gcc/config/xtensa/xtensa.c
-index 64f2a4b..a6d7adb 100644
+index 0602cf90ee8..d80ffb431ef 100644
 --- a/gcc/config/xtensa/xtensa.c
 +++ b/gcc/config/xtensa/xtensa.c
 @@ -116,11 +116,6 @@ enum internal_test
@@ -100,7 +100,7 @@ index 64f2a4b..a6d7adb 100644
  };
  
  /* Vector, indexed by hard register number, which contains 1 for a
-@@ -2669,24 +2671,29 @@ compute_frame_size (int size)
+@@ -2670,24 +2672,29 @@ compute_frame_size (int size)
  {
    int regno;
  
@@ -136,7 +136,7 @@ index 64f2a4b..a6d7adb 100644
  }
  
  
-@@ -2740,6 +2747,7 @@ xtensa_expand_prologue (void)
+@@ -2741,6 +2748,7 @@ xtensa_expand_prologue (void)
      {
        int regno;
        HOST_WIDE_INT offset = 0;
@@ -144,7 +144,7 @@ index 64f2a4b..a6d7adb 100644
  
        /* -128 is a limit of single addi instruction. */
        if (total_size > 0 && total_size <= 128)
-@@ -2753,7 +2761,7 @@ xtensa_expand_prologue (void)
+@@ -2754,7 +2762,7 @@ xtensa_expand_prologue (void)
  	  add_reg_note (insn, REG_FRAME_RELATED_EXPR, note_rtx);
  	  offset = total_size - UNITS_PER_WORD;
  	}
@@ -153,7 +153,7 @@ index 64f2a4b..a6d7adb 100644
  	{
  	  /* 1020 is maximal s32i offset, if the frame is bigger than that
  	   * we move sp to the end of callee-saved save area, save and then
-@@ -2761,13 +2769,13 @@ xtensa_expand_prologue (void)
+@@ -2762,13 +2770,13 @@ xtensa_expand_prologue (void)
  	  if (total_size > 1024)
  	    {
  	      insn = emit_insn (gen_addsi3 (stack_pointer_rtx, stack_pointer_rtx,
@@ -170,7 +170,7 @@ index 64f2a4b..a6d7adb 100644
  	    }
  	  else
  	    {
-@@ -2803,13 +2811,13 @@ xtensa_expand_prologue (void)
+@@ -2804,13 +2812,13 @@ xtensa_expand_prologue (void)
  	{
  	  rtx tmp_reg = gen_rtx_REG (Pmode, A9_REG);
  	  emit_move_insn (tmp_reg, GEN_INT (total_size -
@@ -186,7 +186,7 @@ index 64f2a4b..a6d7adb 100644
  						 total_size));
  	  add_reg_note (insn, REG_FRAME_RELATED_EXPR, note_rtx);
  	}
-@@ -2877,21 +2885,21 @@ xtensa_expand_epilogue (void)
+@@ -2878,21 +2886,21 @@ xtensa_expand_epilogue (void)
        int regno;
        HOST_WIDE_INT offset;
  
@@ -213,7 +213,7 @@ index 64f2a4b..a6d7adb 100644
  	}
  
        /* Prevent reordering of saved a0 update and loading it back from
-@@ -2911,16 +2919,16 @@ xtensa_expand_epilogue (void)
+@@ -2912,16 +2920,16 @@ xtensa_expand_epilogue (void)
  	    }
  	}
  
@@ -236,7 +236,7 @@ index 64f2a4b..a6d7adb 100644
  
  	      emit_insn (gen_addsi3 (stack_pointer_rtx,
  				     stack_pointer_rtx,
-@@ -2929,7 +2937,8 @@ xtensa_expand_epilogue (void)
+@@ -2930,7 +2938,8 @@ xtensa_expand_epilogue (void)
  	  else
  	    {
  	      rtx tmp_reg = gen_rtx_REG (Pmode, A9_REG);
@@ -246,7 +246,7 @@ index 64f2a4b..a6d7adb 100644
  	      emit_insn (gen_addsi3 (stack_pointer_rtx, stack_pointer_rtx,
  				     tmp_reg));
  	    }
-@@ -2940,11 +2949,22 @@ xtensa_expand_epilogue (void)
+@@ -2941,11 +2950,22 @@ xtensa_expand_epilogue (void)
  				  stack_pointer_rtx,
  				  EH_RETURN_STACKADJ_RTX));
      }
@@ -272,7 +272,7 @@ index 64f2a4b..a6d7adb 100644
  xtensa_set_return_address (rtx address, rtx scratch)
  {
 diff --git a/gcc/config/xtensa/xtensa.h b/gcc/config/xtensa/xtensa.h
-index 584080b..683ce01 100644
+index 584080b4a01..683ce0101c8 100644
 --- a/gcc/config/xtensa/xtensa.h
 +++ b/gcc/config/xtensa/xtensa.h
 @@ -23,8 +23,6 @@ along with GCC; see the file COPYING3.  If not see
@@ -302,7 +302,7 @@ index 584080b..683ce01 100644
        default:								\
  	gcc_unreachable ();						\
 diff --git a/gcc/config/xtensa/xtensa.md b/gcc/config/xtensa/xtensa.md
-index 3a3a902..9b2cde9 100644
+index 3a3a9029a31..9b2cde9d6a4 100644
 --- a/gcc/config/xtensa/xtensa.md
 +++ b/gcc/config/xtensa/xtensa.md
 @@ -1663,7 +1663,7 @@
@@ -315,5 +315,5 @@ index 3a3a902..9b2cde9 100644
    return TARGET_WINDOWED_ABI ?
        (TARGET_DENSITY ? "retw.n" : "retw") :
 -- 
-2.1.4
+2.11.0 (Apple Git-81)
 

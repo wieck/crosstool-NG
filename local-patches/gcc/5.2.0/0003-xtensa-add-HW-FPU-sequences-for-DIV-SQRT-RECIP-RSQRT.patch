@@ -1,7 +1,7 @@
-From 1b82e0930ab631ee487220c3a4c971781bf983d5 Mon Sep 17 00:00:00 2001
+From 741c2dea9c8719b425d502315a9f417b716790a4 Mon Sep 17 00:00:00 2001
 From: Max Filippov <jcmvbkbc@gmail.com>
 Date: Thu, 13 Oct 2016 23:49:44 -0700
-Subject: [PATCH 3/3] xtensa: add HW FPU sequences for DIV/SQRT/RECIP/RSQRT
+Subject: [PATCH 3/9] xtensa: add HW FPU sequences for DIV/SQRT/RECIP/RSQRT
 
 Use new FPU instruction sequences documented in the ISA book to
 implement __divsf3, __divdf3, __recipsf2, __recipdf2, __rsqrtsf2,
@@ -28,7 +28,7 @@ Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
  3 files changed, 335 insertions(+), 1 deletion(-)
 
 diff --git a/libgcc/config/xtensa/ieee754-df.S b/libgcc/config/xtensa/ieee754-df.S
-index a7ae209..c2736fb 100644
+index a7ae2099dc1..c2736fb01a7 100644
 --- a/libgcc/config/xtensa/ieee754-df.S
 +++ b/libgcc/config/xtensa/ieee754-df.S
 @@ -1217,6 +1217,57 @@ __muldf3:
@@ -227,7 +227,7 @@ index a7ae209..c2736fb 100644
 +#endif /* L_rsqrtdf2 */
 +#endif /* XCHAL_HAVE_DFP_RSQRT */
 diff --git a/libgcc/config/xtensa/ieee754-sf.S b/libgcc/config/xtensa/ieee754-sf.S
-index 7e397dc..00475cd 100644
+index 7e397dc9857..00475cd1c79 100644
 --- a/libgcc/config/xtensa/ieee754-sf.S
 +++ b/libgcc/config/xtensa/ieee754-sf.S
 @@ -885,6 +885,51 @@ __mulsf3:
@@ -404,7 +404,7 @@ index 7e397dc..00475cd 100644
 +#endif /* L_rsqrtsf2 */
 +#endif /* XCHAL_HAVE_FP_RSQRT */
 diff --git a/libgcc/config/xtensa/t-xtensa b/libgcc/config/xtensa/t-xtensa
-index ed3eb84..90df5f1 100644
+index ed3eb84a71b..90df5f15daa 100644
 --- a/libgcc/config/xtensa/t-xtensa
 +++ b/libgcc/config/xtensa/t-xtensa
 @@ -4,10 +4,12 @@ LIB1ASMFUNCS = _mulsi3 _divsi3 _modsi3 _udivsi3 _umodsi3 \
@@ -422,5 +422,5 @@ index ed3eb84..90df5f1 100644
  
  LIB2ADD = $(srcdir)/config/xtensa/lib2funcs.S
 -- 
-2.1.4
+2.11.0 (Apple Git-81)
 
