@@ -1,7 +1,7 @@
 From daa6ae40cdc8099f54c3e68a586fc1b906169c5a Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Wed, 15 Jul 2015 14:56:07 +1000
-Subject: [PATCH 04/21] xtensa: Add weak symbols for locking functions
+Subject: [PATCH 04/22] xtensa: Add weak symbols for locking functions
 
 Small performance hit if using single threaded, as locks are now a call
 to a no-op dummy function rather than a compile-time no-op.
@@ -15,7 +15,7 @@ to a no-op dummy function rather than a compile-time no-op.
  create mode 100644 newlib/libc/sys/xtensa/sys/lock.h
 
 diff --git a/newlib/libc/sys/xtensa/Makefile.am b/newlib/libc/sys/xtensa/Makefile.am
-index a0736a2..cb6de92 100644
+index a0736a246..cb6de9252 100644
 --- a/newlib/libc/sys/xtensa/Makefile.am
 +++ b/newlib/libc/sys/xtensa/Makefile.am
 @@ -6,7 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
@@ -28,7 +28,7 @@ index a0736a2..cb6de92 100644
  all: crt0.o
  
 diff --git a/newlib/libc/sys/xtensa/Makefile.in b/newlib/libc/sys/xtensa/Makefile.in
-index fccbcdd..8d55da8 100644
+index fccbcddc1..8d55da870 100644
 --- a/newlib/libc/sys/xtensa/Makefile.in
 +++ b/newlib/libc/sys/xtensa/Makefile.in
 @@ -57,7 +57,7 @@ ARFLAGS = cru
@@ -51,7 +51,7 @@ index fccbcdd..8d55da8 100644
  all: all-am
 diff --git a/newlib/libc/sys/xtensa/lock.c b/newlib/libc/sys/xtensa/lock.c
 new file mode 100644
-index 0000000..d7df928
+index 000000000..d7df92886
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/lock.c
 @@ -0,0 +1,22 @@
@@ -79,7 +79,7 @@ index 0000000..d7df928
 +void _lock_release_recursive(_lock_t *lock) __attribute__((weak, alias("__dummy_lock")));
 diff --git a/newlib/libc/sys/xtensa/sys/lock.h b/newlib/libc/sys/xtensa/sys/lock.h
 new file mode 100644
-index 0000000..0ff3475
+index 000000000..0ff347583
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/sys/lock.h
 @@ -0,0 +1,50 @@
@@ -134,5 +134,5 @@ index 0000000..0ff3475
 +
 +#endif /* _XTENSA_LOCK_H__ */
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

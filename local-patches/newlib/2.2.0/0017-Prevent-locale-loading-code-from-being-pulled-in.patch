@@ -1,14 +1,14 @@
 From c20b68476e590e7460b1a5f6cebe95e39fc22bae Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Thu, 26 May 2016 14:01:56 +0800
-Subject: [PATCH 17/21] Prevent locale loading code from being pulled in
+Subject: [PATCH 17/22] Prevent locale loading code from being pulled in
 
 ---
  newlib/libc/locale/timelocal.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/newlib/libc/locale/timelocal.c b/newlib/libc/locale/timelocal.c
-index ca2f79b..76c7c2a 100644
+index ca2f79b50..76c7c2a84 100644
 --- a/newlib/libc/locale/timelocal.c
 +++ b/newlib/libc/locale/timelocal.c
 @@ -159,8 +159,8 @@ __get_current_time_locale(void) {
@@ -30,5 +30,5 @@ index ca2f79b..76c7c2a 100644
  	return (ret);
  }
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

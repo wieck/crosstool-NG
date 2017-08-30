@@ -1,7 +1,7 @@
 From b7922f1e7539d3759420e32809493a3051b6a364 Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Tue, 24 May 2016 20:08:15 +0800
-Subject: [PATCH 14/21] Make some data const
+Subject: [PATCH 14/22] Make some data const
 
 ---
  newlib/libc/ctype/ctype_.c     |  2 +-
@@ -19,7 +19,7 @@ Subject: [PATCH 14/21] Make some data const
  12 files changed, 22 insertions(+), 20 deletions(-)
 
 diff --git a/newlib/libc/ctype/ctype_.c b/newlib/libc/ctype/ctype_.c
-index 164a8ee..319b0e2 100644
+index 164a8eed7..319b0e220 100644
 --- a/newlib/libc/ctype/ctype_.c
 +++ b/newlib/libc/ctype/ctype_.c
 @@ -153,7 +153,7 @@ char *__ctype_ptr = (char *) _ctype_ + 1;
@@ -32,7 +32,7 @@ index 164a8ee..319b0e2 100644
  #endif
  
 diff --git a/newlib/libc/include/ctype.h b/newlib/libc/include/ctype.h
-index 56ad5ab..1eb3f78 100644
+index 56ad5abb6..1eb3f787f 100644
 --- a/newlib/libc/include/ctype.h
 +++ b/newlib/libc/include/ctype.h
 @@ -42,7 +42,7 @@ int _EXFUN(toascii, (int __c));
@@ -45,7 +45,7 @@ index 56ad5ab..1eb3f78 100644
  #ifndef __cplusplus
  /* These macros are intentionally written in a manner that will trigger
 diff --git a/newlib/libc/locale/lctype.c b/newlib/libc/locale/lctype.c
-index 28575dd..4e39bd6 100644
+index 28575dd08..4e39bd6b1 100644
 --- a/newlib/libc/locale/lctype.c
 +++ b/newlib/libc/locale/lctype.c
 @@ -29,7 +29,7 @@
@@ -58,7 +58,7 @@ index 28575dd..4e39bd6 100644
  static const struct lc_ctype_T _C_ctype_locale = {
  	"ASCII",			/* codeset */
 diff --git a/newlib/libc/locale/lmonetary.c b/newlib/libc/locale/lmonetary.c
-index 80c2d04..04ea2d4 100644
+index 80c2d0442..04ea2d40c 100644
 --- a/newlib/libc/locale/lmonetary.c
 +++ b/newlib/libc/locale/lmonetary.c
 @@ -36,8 +36,8 @@ extern const char * __fix_locale_grouping_str(const char *);
@@ -73,7 +73,7 @@ index 80c2d04..04ea2d4 100644
  static wchar_t	wempty[] = L"";
  #endif
 diff --git a/newlib/libc/locale/lnumeric.c b/newlib/libc/locale/lnumeric.c
-index ae24470..64b9645 100644
+index ae2447066..64b9645be 100644
 --- a/newlib/libc/locale/lnumeric.c
 +++ b/newlib/libc/locale/lnumeric.c
 @@ -33,7 +33,7 @@ extern const char *__fix_locale_grouping_str(const char *);
@@ -86,7 +86,7 @@ index ae24470..64b9645 100644
  static const struct lc_numeric_T _C_numeric_locale = {
  	".",     			/* decimal_point */
 diff --git a/newlib/libc/locale/locale.c b/newlib/libc/locale/locale.c
-index 8e2b121..4f645d0 100644
+index 8e2b121bc..4f645d072 100644
 --- a/newlib/libc/locale/locale.c
 +++ b/newlib/libc/locale/locale.c
 @@ -191,14 +191,16 @@ No supporting OS subroutines are required.
@@ -126,7 +126,7 @@ index 8e2b121..4f645d0 100644
  char *
  _DEFUN(_setlocale_r, (p, category, locale),
 diff --git a/newlib/libc/search/extern.h b/newlib/libc/search/extern.h
-index 666a6e5..a528dde 100644
+index 666a6e5bf..a528dded6 100644
 --- a/newlib/libc/search/extern.h
 +++ b/newlib/libc/search/extern.h
 @@ -59,7 +59,7 @@ void	 __reclaim_buf(HTAB *, BUFHEAD *);
@@ -139,7 +139,7 @@ index 666a6e5..a528dde 100644
  #ifdef HASH_STATISTICS
  extern int hash_accesses, hash_collisions, hash_expansions, hash_overflows;
 diff --git a/newlib/libc/search/hash_func.c b/newlib/libc/search/hash_func.c
-index 355f0b5..d584cf5 100644
+index 355f0b592..d584cf55d 100644
 --- a/newlib/libc/search/hash_func.c
 +++ b/newlib/libc/search/hash_func.c
 @@ -53,7 +53,7 @@ static __uint32_t hash3(const void *, size_t);
@@ -152,7 +152,7 @@ index 355f0b5..d584cf5 100644
  /*
   * HASH FUNCTIONS
 diff --git a/newlib/libc/stdlib/getopt.c b/newlib/libc/stdlib/getopt.c
-index 1094747..c6934b2 100644
+index 109474764..c6934b280 100644
 --- a/newlib/libc/stdlib/getopt.c
 +++ b/newlib/libc/stdlib/getopt.c
 @@ -113,8 +113,8 @@ typedef enum GETOPT_ORDERING_T
@@ -167,7 +167,7 @@ index 1094747..c6934b2 100644
  /* static variables */
  static int optwhere = 0;
 diff --git a/newlib/libc/stdlib/local.h b/newlib/libc/stdlib/local.h
-index 12e6998..117021e 100644
+index 12e6998c1..117021eb7 100644
 --- a/newlib/libc/stdlib/local.h
 +++ b/newlib/libc/stdlib/local.h
 @@ -11,7 +11,7 @@ char *__locale_charset(_NOARGS);
@@ -189,7 +189,7 @@ index 12e6998..117021e 100644
  int __ascii_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
  		    const char *, mbstate_t *);
 diff --git a/newlib/libc/stdlib/mbtowc_r.c b/newlib/libc/stdlib/mbtowc_r.c
-index 986595c..08ea28e 100644
+index 986595cfd..08ea28ed2 100644
 --- a/newlib/libc/stdlib/mbtowc_r.c
 +++ b/newlib/libc/stdlib/mbtowc_r.c
 @@ -7,7 +7,7 @@
@@ -202,7 +202,7 @@ index 986595c..08ea28e 100644
  #ifdef __CYGWIN__
     /* Cygwin starts up in UTF-8 mode. */
 diff --git a/newlib/libc/stdlib/wctomb_r.c b/newlib/libc/stdlib/wctomb_r.c
-index 13e1e4c..bea7319 100644
+index 13e1e4c36..bea731979 100644
 --- a/newlib/libc/stdlib/wctomb_r.c
 +++ b/newlib/libc/stdlib/wctomb_r.c
 @@ -6,7 +6,7 @@
@@ -215,5 +215,5 @@ index 13e1e4c..bea7319 100644
  #ifdef __CYGWIN__
     /* Cygwin starts up in UTF-8 mode. */
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

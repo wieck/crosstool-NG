@@ -1,14 +1,14 @@
 From 4ddc99d47677b94c115cafcaa4a6939042ea8c4f Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Sat, 28 May 2016 15:26:58 +0800
-Subject: [PATCH 19/21] Update xtensa config in core-isa.h
+Subject: [PATCH 19/22] Update xtensa config in core-isa.h
 
 ---
  .../sys/xtensa/include/xtensa/config/core-isa.h    | 243 +++++++++++----------
  1 file changed, 126 insertions(+), 117 deletions(-)
 
 diff --git a/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h b/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
-index e013722..f3f4e45 100644
+index e01372285..f3f4e45f0 100644
 --- a/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
 +++ b/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
 @@ -7,7 +7,7 @@
@@ -467,5 +467,5 @@ index e013722..f3f4e45 100644
  
  /*----------------------------------------------------------------------
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

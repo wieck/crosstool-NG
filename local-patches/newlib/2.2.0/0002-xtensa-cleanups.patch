@@ -1,7 +1,7 @@
 From ebe53e6768db899e832bdf16db4eb8ffe96a29a2 Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Wed, 15 Jul 2015 13:31:43 +1000
-Subject: [PATCH 02/21] xtensa: cleanups
+Subject: [PATCH 02/22] xtensa: cleanups
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
@@ -20,7 +20,7 @@ Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
  delete mode 100644 newlib/libc/sys/xtensa/sys/fcntl.h
 
 diff --git a/newlib/Makefile.am b/newlib/Makefile.am
-index e8bad51..836b3c2 100644
+index e8bad5127..836b3c236 100644
 --- a/newlib/Makefile.am
 +++ b/newlib/Makefile.am
 @@ -232,6 +232,16 @@ stmp-targ-include: config.status
@@ -59,7 +59,7 @@ index e8bad51..836b3c2 100644
  	    if [ -f $$i ]; then \
  	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 diff --git a/newlib/Makefile.in b/newlib/Makefile.in
-index 82083dd..632c9f8 100644
+index 82083dd17..632c9f82c 100644
 --- a/newlib/Makefile.in
 +++ b/newlib/Makefile.in
 @@ -978,6 +978,16 @@ stmp-targ-include: config.status
@@ -98,7 +98,7 @@ index 82083dd..632c9f8 100644
  	    if [ -f $$i ]; then \
  	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 diff --git a/newlib/libc/include/sys/config.h b/newlib/libc/include/sys/config.h
-index 0d27d6c..ee9d3b7 100644
+index 0d27d6c11..ee9d3b7a7 100644
 --- a/newlib/libc/include/sys/config.h
 +++ b/newlib/libc/include/sys/config.h
 @@ -185,6 +185,11 @@
@@ -114,7 +114,7 @@ index 0d27d6c..ee9d3b7 100644
     of having these definitions here is to not include limits.h, which
     would pollute the user namespace, while still using types of the
 diff --git a/newlib/libc/machine/xtensa/Makefile.in b/newlib/libc/machine/xtensa/Makefile.in
-index baa778f..ef54644 100644
+index baa778fb1..ef546441b 100644
 --- a/newlib/libc/machine/xtensa/Makefile.in
 +++ b/newlib/libc/machine/xtensa/Makefile.in
 @@ -258,10 +258,10 @@ lib_a-memset.obj: memset.S
@@ -131,7 +131,7 @@ index baa778f..ef54644 100644
  lib_a-strcpy.o: strcpy.S
  	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcpy.o `test -f 'strcpy.S' || echo '$(srcdir)/'`strcpy.S
 diff --git a/newlib/libc/machine/xtensa/xtensa-asm.h b/newlib/libc/machine/xtensa/xtensa-asm.h
-index 19ca06f..ace4c02 100644
+index 19ca06fcc..ace4c0289 100644
 --- a/newlib/libc/machine/xtensa/xtensa-asm.h
 +++ b/newlib/libc/machine/xtensa/xtensa-asm.h
 @@ -19,7 +19,7 @@
@@ -144,7 +144,7 @@ index 19ca06f..ace4c02 100644
  # Define macros for leaf function entry and return, supporting either the
  # standard register windowed ABI or the non-windowed call0 ABI.  These
 diff --git a/newlib/libc/stdlib/mallocr.c b/newlib/libc/stdlib/mallocr.c
-index ce6b185..ecc445f 100644
+index ce6b18547..ecc445f3d 100644
 --- a/newlib/libc/stdlib/mallocr.c
 +++ b/newlib/libc/stdlib/mallocr.c
 @@ -1396,8 +1396,6 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -158,7 +158,7 @@ index ce6b185..ecc445f 100644
  #define MALLOC_ALIGNMENT       (SIZE_SZ < 4 ? 8 : (SIZE_SZ + SIZE_SZ))
 diff --git a/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h b/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
 new file mode 100644
-index 0000000..612fbf8
+index 000000000..612fbf840
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
 @@ -0,0 +1,459 @@
@@ -623,7 +623,7 @@ index 0000000..612fbf8
 +
 diff --git a/newlib/libc/sys/xtensa/sys/errno.h b/newlib/libc/sys/xtensa/sys/errno.h
 deleted file mode 100644
-index 90dd78d..0000000
+index 90dd78d22..000000000
 --- a/newlib/libc/sys/xtensa/sys/errno.h
 +++ /dev/null
 @@ -1,175 +0,0 @@
@@ -804,7 +804,7 @@ index 90dd78d..0000000
 -#endif /* _SYS_ERRNO_H */
 diff --git a/newlib/libc/sys/xtensa/sys/fcntl.h b/newlib/libc/sys/xtensa/sys/fcntl.h
 deleted file mode 100644
-index bc7c41c..0000000
+index bc7c41c2c..000000000
 --- a/newlib/libc/sys/xtensa/sys/fcntl.h
 +++ /dev/null
 @@ -1,131 +0,0 @@
@@ -940,5 +940,5 @@ index bc7c41c..0000000
 -#endif
 -#endif	/* !_FCNTL_ */
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

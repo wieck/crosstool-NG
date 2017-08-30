@@ -1,7 +1,7 @@
 From cbe80794ed0083cd77764a42eff4e8508e7963f4 Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Wed, 20 Apr 2016 14:58:49 +1000
-Subject: [PATCH 10/21] nano malloc: Uncomment locking primitives (commented by
+Subject: [PATCH 10/22] nano malloc: Uncomment locking primitives (commented by
  default)
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 10/21] nano malloc: Uncomment locking primitives (commented by
  1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/newlib/libc/stdlib/nano-mallocr.c b/newlib/libc/stdlib/nano-mallocr.c
-index 8d6ca5c..4a82574 100644
+index 8d6ca5ce0..4a8257419 100644
 --- a/newlib/libc/stdlib/nano-mallocr.c
 +++ b/newlib/libc/stdlib/nano-mallocr.c
 @@ -56,9 +56,8 @@
@@ -25,5 +25,5 @@ index 8d6ca5c..4a82574 100644
  #define RERRNO reent_ptr->_errno
  
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

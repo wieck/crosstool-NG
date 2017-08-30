@@ -1,7 +1,7 @@
 From 54eb5243a28d2949807c75534c4603c8f9e72cb5 Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Wed, 15 Jul 2015 13:30:51 +1000
-Subject: [PATCH 01/21] xtensa: add port
+Subject: [PATCH 01/22] xtensa: add port
 
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Angus Gratton <gus@projectgus.com>
@@ -143,7 +143,7 @@ Signed-off-by: Angus Gratton <gus@projectgus.com>
  create mode 100644 newlib/libm/machine/xtensa/feupdateenv.c
 
 diff --git a/configure b/configure
-index ae23ce4..b016e52 100755
+index ae23ce435..b016e5229 100755
 --- a/configure
 +++ b/configure
 @@ -2769,7 +2769,6 @@ libgcj="target-libffi \
@@ -165,7 +165,7 @@ index ae23ce4..b016e52 100755
  # these tools are built using the target libraries, and are intended to
  # run only in the target environment
 diff --git a/configure.ac b/configure.ac
-index 80313d0..d48cd21 100644
+index 80313d060..d48cd21d1 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -153,7 +153,6 @@ libgcj="target-libffi \
@@ -187,7 +187,7 @@ index 80313d0..d48cd21 100644
  # these tools are built using the target libraries, and are intended to
  # run only in the target environment
 diff --git a/libgloss/close.c b/libgloss/close.c
-index 7aafcea..5b3baba 100644
+index 7aafcea46..5b3baba63 100644
 --- a/libgloss/close.c
 +++ b/libgloss/close.c
 @@ -17,9 +17,26 @@
@@ -218,7 +218,7 @@ index 7aafcea..5b3baba 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/fstat.c b/libgloss/fstat.c
-index 8082d63..81f9842 100644
+index 8082d6395..81f9842a5 100644
 --- a/libgloss/fstat.c
 +++ b/libgloss/fstat.c
 @@ -18,6 +18,9 @@
@@ -253,7 +253,7 @@ index 8082d63..81f9842 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/getpid.c b/libgloss/getpid.c
-index 07f7f92..083303b 100644
+index 07f7f9279..083303b05 100644
 --- a/libgloss/getpid.c
 +++ b/libgloss/getpid.c
 @@ -17,9 +17,25 @@
@@ -283,7 +283,7 @@ index 07f7f92..083303b 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/kill.c b/libgloss/kill.c
-index afc1257..61a7fb8 100644
+index afc1257cf..61a7fb8bc 100644
 --- a/libgloss/kill.c
 +++ b/libgloss/kill.c
 @@ -17,6 +17,9 @@
@@ -318,7 +318,7 @@ index afc1257..61a7fb8 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/lseek.c b/libgloss/lseek.c
-index 1df36f5..d05200c 100644
+index 1df36f55e..d05200c29 100644
 --- a/libgloss/lseek.c
 +++ b/libgloss/lseek.c
 @@ -19,6 +19,9 @@
@@ -353,7 +353,7 @@ index 1df36f5..d05200c 100644
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 +
 diff --git a/libgloss/open.c b/libgloss/open.c
-index 468b11c..6793a50 100644
+index 468b11cd1..6793a5080 100644
 --- a/libgloss/open.c
 +++ b/libgloss/open.c
 @@ -19,6 +19,9 @@
@@ -387,7 +387,7 @@ index 468b11c..6793a50 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/read.c b/libgloss/read.c
-index 419a8ed..83c2ba4 100644
+index 419a8ed64..83c2ba464 100644
 --- a/libgloss/read.c
 +++ b/libgloss/read.c
 @@ -20,6 +20,9 @@ extern char _DEFUN_VOID (inbyte);
@@ -432,7 +432,7 @@ index 419a8ed..83c2ba4 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/sbrk.c b/libgloss/sbrk.c
-index c222b4b..b38d7cb 100644
+index c222b4bbf..b38d7cb88 100644
 --- a/libgloss/sbrk.c
 +++ b/libgloss/sbrk.c
 @@ -22,11 +22,19 @@
@@ -456,7 +456,7 @@ index c222b4b..b38d7cb 100644
  sbrk (nbytes)
       int nbytes;
 diff --git a/libgloss/stat.c b/libgloss/stat.c
-index ebb7de3..75fd786 100644
+index ebb7de3f5..75fd7868d 100644
 --- a/libgloss/stat.c
 +++ b/libgloss/stat.c
 @@ -19,6 +19,9 @@
@@ -489,7 +489,7 @@ index ebb7de3..75fd786 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/unlink.c b/libgloss/unlink.c
-index 15ea7e8..6ae5f6d 100644
+index 15ea7e8a9..6ae5f6d41 100644
 --- a/libgloss/unlink.c
 +++ b/libgloss/unlink.c
 @@ -19,6 +19,9 @@
@@ -522,7 +522,7 @@ index 15ea7e8..6ae5f6d 100644
 +
 +#endif /* REENTRANT_SYSCALLS_PROVIDED */
 diff --git a/libgloss/write.c b/libgloss/write.c
-index 292a68e..220e82e 100644
+index 292a68e53..220e82e62 100644
 --- a/libgloss/write.c
 +++ b/libgloss/write.c
 @@ -21,6 +21,9 @@ extern int  _EXFUN (outbyte, (char x));
@@ -536,7 +536,7 @@ index 292a68e..220e82e 100644
  _DEFUN (write, (fd, buf, nbytes),
         int fd _AND
 diff --git a/newlib/Makefile.am b/newlib/Makefile.am
-index 5ecce4c..e8bad51 100644
+index 5ecce4c10..e8bad5127 100644
 --- a/newlib/Makefile.am
 +++ b/newlib/Makefile.am
 @@ -156,15 +156,15 @@ libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
@@ -558,7 +558,7 @@ index 5ecce4c..e8bad51 100644
  
  libc/libc.a: ; @true
 diff --git a/newlib/Makefile.in b/newlib/Makefile.in
-index 468ae99..82083dd 100644
+index 468ae9985..82083dd17 100644
 --- a/newlib/Makefile.in
 +++ b/newlib/Makefile.in
 @@ -904,15 +904,15 @@ uninstall-am: uninstall-toollibDATA uninstall-toollibLIBRARIES \
@@ -580,7 +580,7 @@ index 468ae99..82083dd 100644
  
  @USE_LIBTOOL_FALSE@libc/libc.a: ; @true
 diff --git a/newlib/configure.host b/newlib/configure.host
-index c4773d9..a9b1bf6 100644
+index c4773d983..a9b1bf67a 100644
 --- a/newlib/configure.host
 +++ b/newlib/configure.host
 @@ -300,6 +300,12 @@ case "${host_cpu}" in
@@ -618,7 +618,7 @@ index c4773d9..a9b1bf6 100644
  	syscall_dir=syscalls
  	;;
 diff --git a/newlib/doc/makedoc.c b/newlib/doc/makedoc.c
-index 7d38a5d..94c6027 100644
+index 7d38a5db8..94c60275a 100644
 --- a/newlib/doc/makedoc.c
 +++ b/newlib/doc/makedoc.c
 @@ -136,6 +136,13 @@ static void DEFUN(catchar,(buffer, ch),
@@ -636,7 +636,7 @@ index 7d38a5d..94c6027 100644
    {
      buffer->size *=2;
 diff --git a/newlib/libc/Makefile.am b/newlib/libc/Makefile.am
-index 21a74fe..a5ff907 100644
+index 21a74fe78..a5ff90740 100644
 --- a/newlib/libc/Makefile.am
 +++ b/newlib/libc/Makefile.am
 @@ -123,6 +123,29 @@ crt0.o: sys/crt0.o
@@ -704,7 +704,7 @@ index 21a74fe..a5ff907 100644
  ACLOCAL_AMFLAGS = -I .. -I ../..
  CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 diff --git a/newlib/libc/Makefile.in b/newlib/libc/Makefile.in
-index cbddc5f..d79a87c 100644
+index cbddc5fdf..d79a87ca1 100644
 --- a/newlib/libc/Makefile.in
 +++ b/newlib/libc/Makefile.in
 @@ -408,6 +408,17 @@ libc_la_LDFLAGS = -Xcompiler -nostdlib
@@ -760,7 +760,7 @@ index cbddc5f..d79a87c 100644
  	targetdep.tex $(SUBDEFS)
  
 diff --git a/newlib/libc/include/machine/ieeefp.h b/newlib/libc/include/machine/ieeefp.h
-index 8304a1b..f11dc05 100644
+index 8304a1b87..f11dc0535 100644
 --- a/newlib/libc/include/machine/ieeefp.h
 +++ b/newlib/libc/include/machine/ieeefp.h
 @@ -415,6 +415,14 @@
@@ -779,7 +779,7 @@ index 8304a1b..f11dc05 100644
  #ifndef __IEEE_LITTLE_ENDIAN
  #error Endianess not declared!!
 diff --git a/newlib/libc/include/machine/setjmp.h b/newlib/libc/include/machine/setjmp.h
-index f7e5865..9f9d9e4 100644
+index f7e5865ab..9f9d9e49b 100644
 --- a/newlib/libc/include/machine/setjmp.h
 +++ b/newlib/libc/include/machine/setjmp.h
 @@ -278,6 +278,33 @@ _BEGIN_STD_C
@@ -817,7 +817,7 @@ index f7e5865..9f9d9e4 100644
  /* 16 GPRs, pc, hi, lo */
  #define _JBLEN 19
 diff --git a/newlib/libc/include/setjmp.h b/newlib/libc/include/setjmp.h
-index 521eac5..3d815d9 100644
+index 521eac5a1..3d815d9b9 100644
 --- a/newlib/libc/include/setjmp.h
 +++ b/newlib/libc/include/setjmp.h
 @@ -18,6 +18,8 @@ void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval))
@@ -830,7 +830,7 @@ index 521eac5..3d815d9 100644
  _END_STD_C
  
 diff --git a/newlib/libc/include/stdlib.h b/newlib/libc/include/stdlib.h
-index 38ac296..254ddd7 100644
+index 38ac29654..254ddd71f 100644
 --- a/newlib/libc/include/stdlib.h
 +++ b/newlib/libc/include/stdlib.h
 @@ -55,6 +55,10 @@ typedef struct
@@ -869,7 +869,7 @@ index 38ac296..254ddd7 100644
  int	_EXFUN(rand,(_VOID));
  _PTR	_EXFUN_NOTHROW(realloc,(_PTR __r, size_t __size));
 diff --git a/newlib/libc/include/wchar.h b/newlib/libc/include/wchar.h
-index 596cce6..810a6c0 100644
+index 596cce698..810a6c0e3 100644
 --- a/newlib/libc/include/wchar.h
 +++ b/newlib/libc/include/wchar.h
 @@ -121,6 +121,9 @@ double _EXFUN(wcstod, (const wchar_t *__restrict, wchar_t **__restrict));
@@ -883,7 +883,7 @@ index 596cce6..810a6c0 100644
  size_t	_EXFUN(wcsxfrm, (wchar_t *__restrict, const wchar_t *__restrict,
  				size_t));
 diff --git a/newlib/libc/libc.texinfo b/newlib/libc/libc.texinfo
-index 82f283c..41ef190 100644
+index 82f283cec..41ef19092 100644
 --- a/newlib/libc/libc.texinfo
 +++ b/newlib/libc/libc.texinfo
 @@ -1,7 +1,28 @@
@@ -1041,7 +1041,7 @@ index 82f283c..41ef190 100644
  
  
 diff --git a/newlib/libc/machine/Makefile.am b/newlib/libc/machine/Makefile.am
-index 147af84..3610088 100644
+index 147af840b..3610088b8 100644
 --- a/newlib/libc/machine/Makefile.am
 +++ b/newlib/libc/machine/Makefile.am
 @@ -20,7 +20,14 @@ endif
@@ -1060,7 +1060,7 @@ index 147af84..3610088 100644
  ACLOCAL_AMFLAGS = -I ../.. -I ../../..
  CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 diff --git a/newlib/libc/machine/Makefile.in b/newlib/libc/machine/Makefile.in
-index 94fa8b1..01ede5c 100644
+index 94fa8b12f..01ede5c9f 100644
 --- a/newlib/libc/machine/Makefile.in
 +++ b/newlib/libc/machine/Makefile.in
 @@ -577,6 +577,11 @@ uninstall-am:
@@ -1076,7 +1076,7 @@ index 94fa8b1..01ede5c 100644
  # Tell versions [3.59,3.63) of GNU make to not export all variables.
  # Otherwise a system limit (for SysV at least) may be exceeded.
 diff --git a/newlib/libc/machine/configure b/newlib/libc/machine/configure
-index 11970f0..2112354 100755
+index 11970f072..2112354e1 100755
 --- a/newlib/libc/machine/configure
 +++ b/newlib/libc/machine/configure
 @@ -572,7 +572,7 @@ PACKAGE_STRING='newlib 2.2.0'
@@ -1107,7 +1107,7 @@ index 11970f0..2112354 100755
    esac;
 diff --git a/newlib/libc/machine/xtensa/Makefile.am b/newlib/libc/machine/xtensa/Makefile.am
 new file mode 100644
-index 0000000..9307cd8
+index 000000000..9307cd871
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/Makefile.am
 @@ -0,0 +1,20 @@
@@ -1133,7 +1133,7 @@ index 0000000..9307cd8
 +CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 diff --git a/newlib/libc/machine/xtensa/Makefile.in b/newlib/libc/machine/xtensa/Makefile.in
 new file mode 100644
-index 0000000..baa778f
+index 000000000..baa778fb1
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/Makefile.in
 @@ -0,0 +1,455 @@
@@ -1594,7 +1594,7 @@ index 0000000..baa778f
 +.NOEXPORT:
 diff --git a/newlib/libc/machine/xtensa/aclocal.m4 b/newlib/libc/machine/xtensa/aclocal.m4
 new file mode 100644
-index 0000000..0564b7c
+index 000000000..0564b7c4e
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/aclocal.m4
 @@ -0,0 +1,992 @@
@@ -2592,7 +2592,7 @@ index 0000000..0564b7c
 +m4_include([../../../acinclude.m4])
 diff --git a/newlib/libc/machine/xtensa/configure b/newlib/libc/machine/xtensa/configure
 new file mode 100755
-index 0000000..0bd340b
+index 000000000..0bd340b2d
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/configure
 @@ -0,0 +1,4994 @@
@@ -7592,7 +7592,7 @@ index 0000000..0bd340b
 +
 diff --git a/newlib/libc/machine/xtensa/configure.in b/newlib/libc/machine/xtensa/configure.in
 new file mode 100644
-index 0000000..5b4e599
+index 000000000..5b4e599ea
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/configure.in
 @@ -0,0 +1,23 @@
@@ -7621,7 +7621,7 @@ index 0000000..5b4e599
 +AC_OUTPUT
 diff --git a/newlib/libc/machine/xtensa/memcpy.S b/newlib/libc/machine/xtensa/memcpy.S
 new file mode 100644
-index 0000000..139dbcd
+index 000000000..139dbcd1d
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/memcpy.S
 @@ -0,0 +1,289 @@
@@ -7916,7 +7916,7 @@ index 0000000..139dbcd
 +	.size	memcpy, . - memcpy
 diff --git a/newlib/libc/machine/xtensa/memset.S b/newlib/libc/machine/xtensa/memset.S
 new file mode 100644
-index 0000000..9ad21b9
+index 000000000..9ad21b9f5
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/memset.S
 @@ -0,0 +1,170 @@
@@ -8092,7 +8092,7 @@ index 0000000..9ad21b9
 +	.size	memset, . - memset
 diff --git a/newlib/libc/machine/xtensa/setjmp.S b/newlib/libc/machine/xtensa/setjmp.S
 new file mode 100644
-index 0000000..33d9309
+index 000000000..33d930914
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/setjmp.S
 @@ -0,0 +1,260 @@
@@ -8358,7 +8358,7 @@ index 0000000..33d9309
 +#endif /* CALL0 ABI */
 diff --git a/newlib/libc/machine/xtensa/strcmp.S b/newlib/libc/machine/xtensa/strcmp.S
 new file mode 100644
-index 0000000..43d7abc
+index 000000000..43d7abc56
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/strcmp.S
 @@ -0,0 +1,778 @@
@@ -9142,7 +9142,7 @@ index 0000000..43d7abc
 +	.size	strcmp, . - strcmp
 diff --git a/newlib/libc/machine/xtensa/strcpy.S b/newlib/libc/machine/xtensa/strcpy.S
 new file mode 100644
-index 0000000..167aa9e
+index 000000000..167aa9e08
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/strcpy.S
 @@ -0,0 +1,235 @@
@@ -9383,7 +9383,7 @@ index 0000000..167aa9e
 +	.size	strcpy, . - strcpy
 diff --git a/newlib/libc/machine/xtensa/strlen.S b/newlib/libc/machine/xtensa/strlen.S
 new file mode 100644
-index 0000000..6560a31
+index 000000000..6560a3185
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/strlen.S
 @@ -0,0 +1,115 @@
@@ -9504,7 +9504,7 @@ index 0000000..6560a31
 +	.size	strlen, . - strlen
 diff --git a/newlib/libc/machine/xtensa/strncpy.S b/newlib/libc/machine/xtensa/strncpy.S
 new file mode 100644
-index 0000000..5206e2c
+index 000000000..5206e2cc2
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/strncpy.S
 @@ -0,0 +1,258 @@
@@ -9768,7 +9768,7 @@ index 0000000..5206e2c
 +	.size	strncpy, . - strncpy
 diff --git a/newlib/libc/machine/xtensa/xtensa-asm.h b/newlib/libc/machine/xtensa/xtensa-asm.h
 new file mode 100644
-index 0000000..19ca06f
+index 000000000..19ca06fcc
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/xtensa-asm.h
 @@ -0,0 +1,72 @@
@@ -9846,7 +9846,7 @@ index 0000000..19ca06f
 +
 diff --git a/newlib/libc/machine/xtensa/xtensa.tex b/newlib/libc/machine/xtensa/xtensa.tex
 new file mode 100644
-index 0000000..1a5bf65
+index 000000000..1a5bf65e7
 --- /dev/null
 +++ b/newlib/libc/machine/xtensa/xtensa.tex
 @@ -0,0 +1,72 @@
@@ -9923,7 +9923,7 @@ index 0000000..1a5bf65
 +
 +@*
 diff --git a/newlib/libc/reent/reent.tex b/newlib/libc/reent/reent.tex
-index 881c572..37fb4ca 100644
+index 881c572c6..37fb4caa8 100644
 --- a/newlib/libc/reent/reent.tex
 +++ b/newlib/libc/reent/reent.tex
 @@ -2,9 +2,24 @@
@@ -9955,7 +9955,7 @@ index 881c572..37fb4ca 100644
  whenever possible, these library functions are reentrant.  However,
  there are some functions that can not be trivially made reentrant.
 diff --git a/newlib/libc/stdio/findfp.c b/newlib/libc/stdio/findfp.c
-index 27408f5..68eb649 100644
+index 27408f548..68eb649d7 100644
 --- a/newlib/libc/stdio/findfp.c
 +++ b/newlib/libc/stdio/findfp.c
 @@ -218,6 +218,7 @@ _DEFUN(__sinit, (s),
@@ -9981,7 +9981,7 @@ index 27408f5..68eb649 100644
    s->__sdidinit = 1;
  
 diff --git a/newlib/libc/stdio/fpurge.c b/newlib/libc/stdio/fpurge.c
-index dc052e8..1993b7d 100644
+index dc052e85b..1993b7dfb 100644
 --- a/newlib/libc/stdio/fpurge.c
 +++ b/newlib/libc/stdio/fpurge.c
 @@ -51,7 +51,7 @@ No supporting OS subroutines are required.
@@ -10003,7 +10003,7 @@ index dc052e8..1993b7d 100644
  void
  _DEFUN(__fpurge, (fp),
 diff --git a/newlib/libc/stdlib/mallocr.c b/newlib/libc/stdlib/mallocr.c
-index ecc445f..ce6b185 100644
+index ecc445f3d..ce6b18547 100644
 --- a/newlib/libc/stdlib/mallocr.c
 +++ b/newlib/libc/stdlib/mallocr.c
 @@ -1396,6 +1396,8 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -10016,7 +10016,7 @@ index ecc445f..ce6b185 100644
  #define MALLOC_ALIGN           8
  #define MALLOC_ALIGNMENT       (SIZE_SZ < 4 ? 8 : (SIZE_SZ + SIZE_SZ))
 diff --git a/newlib/libc/sys.tex b/newlib/libc/sys.tex
-index 3b04c15..8a455bf 100644
+index 3b04c1500..8a455bfb8 100644
 --- a/newlib/libc/sys.tex
 +++ b/newlib/libc/sys.tex
 @@ -14,9 +14,22 @@ system, without an OS---you will at least need to provide do-nothing
@@ -10618,7 +10618,7 @@ index 3b04c15..8a455bf 100644
 +@end table
 +@end ifset
 diff --git a/newlib/libc/sys/configure b/newlib/libc/sys/configure
-index bb52586..75fefb5 100755
+index bb52586df..75fefb56d 100755
 --- a/newlib/libc/sys/configure
 +++ b/newlib/libc/sys/configure
 @@ -572,7 +572,7 @@ PACKAGE_STRING='newlib 2.2.0'
@@ -10649,7 +10649,7 @@ index bb52586..75fefb5 100755
    esac;
 diff --git a/newlib/libc/sys/xtensa/Makefile.am b/newlib/libc/sys/xtensa/Makefile.am
 new file mode 100644
-index 0000000..a0736a2
+index 000000000..a0736a246
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/Makefile.am
 @@ -0,0 +1,14 @@
@@ -10669,7 +10669,7 @@ index 0000000..a0736a2
 +CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 diff --git a/newlib/libc/sys/xtensa/Makefile.in b/newlib/libc/sys/xtensa/Makefile.in
 new file mode 100644
-index 0000000..fccbcdd
+index 000000000..fccbcddc1
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/Makefile.in
 @@ -0,0 +1,388 @@
@@ -11063,7 +11063,7 @@ index 0000000..fccbcdd
 +.NOEXPORT:
 diff --git a/newlib/libc/sys/xtensa/_atexit.c b/newlib/libc/sys/xtensa/_atexit.c
 new file mode 100644
-index 0000000..ecb3dfe
+index 000000000..ecb3dfebe
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/_atexit.c
 @@ -0,0 +1,55 @@
@@ -11124,7 +11124,7 @@ index 0000000..ecb3dfe
 +
 diff --git a/newlib/libc/sys/xtensa/aclocal.m4 b/newlib/libc/sys/xtensa/aclocal.m4
 new file mode 100644
-index 0000000..87c0e78
+index 000000000..87c0e78bc
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/aclocal.m4
 @@ -0,0 +1,880 @@
@@ -12010,7 +12010,7 @@ index 0000000..87c0e78
 +m4_include([../../../acinclude.m4])
 diff --git a/newlib/libc/sys/xtensa/clibrary_init.c b/newlib/libc/sys/xtensa/clibrary_init.c
 new file mode 100644
-index 0000000..e71722a
+index 000000000..e71722a82
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/clibrary_init.c
 @@ -0,0 +1,42 @@
@@ -12058,7 +12058,7 @@ index 0000000..e71722a
 +}
 diff --git a/newlib/libc/sys/xtensa/configure b/newlib/libc/sys/xtensa/configure
 new file mode 100755
-index 0000000..6630705
+index 000000000..663070582
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/configure
 @@ -0,0 +1,4623 @@
@@ -16687,7 +16687,7 @@ index 0000000..6630705
 +
 diff --git a/newlib/libc/sys/xtensa/configure.in b/newlib/libc/sys/xtensa/configure.in
 new file mode 100644
-index 0000000..f1ea73c
+index 000000000..f1ea73c14
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/configure.in
 @@ -0,0 +1,14 @@
@@ -16707,7 +16707,7 @@ index 0000000..f1ea73c
 +AC_OUTPUT
 diff --git a/newlib/libc/sys/xtensa/creat.c b/newlib/libc/sys/xtensa/creat.c
 new file mode 100644
-index 0000000..21e6a18
+index 000000000..21e6a1874
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/creat.c
 @@ -0,0 +1,9 @@
@@ -16722,7 +16722,7 @@ index 0000000..21e6a18
 +}
 diff --git a/newlib/libc/sys/xtensa/crt0.c b/newlib/libc/sys/xtensa/crt0.c
 new file mode 100644
-index 0000000..11725dc
+index 000000000..11725dca5
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/crt0.c
 @@ -0,0 +1,16 @@
@@ -16744,7 +16744,7 @@ index 0000000..11725dc
 +void crt0_unused (void) {}
 diff --git a/newlib/libc/sys/xtensa/include/fenv.h b/newlib/libc/sys/xtensa/include/fenv.h
 new file mode 100644
-index 0000000..2fa76f7
+index 000000000..2fa76f758
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/include/fenv.h
 @@ -0,0 +1,88 @@
@@ -16838,7 +16838,7 @@ index 0000000..2fa76f7
 +#endif
 diff --git a/newlib/libc/sys/xtensa/include/unistd.h b/newlib/libc/sys/xtensa/include/unistd.h
 new file mode 100644
-index 0000000..4f6fd29
+index 000000000..4f6fd29a4
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/include/unistd.h
 @@ -0,0 +1,13 @@
@@ -16857,7 +16857,7 @@ index 0000000..4f6fd29
 +#endif /* _UNISTD_H_ */
 diff --git a/newlib/libc/sys/xtensa/isatty.c b/newlib/libc/sys/xtensa/isatty.c
 new file mode 100644
-index 0000000..fe64209
+index 000000000..fe64209b9
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/isatty.c
 @@ -0,0 +1,18 @@
@@ -16881,7 +16881,7 @@ index 0000000..fe64209
 +}
 diff --git a/newlib/libc/sys/xtensa/sys/errno.h b/newlib/libc/sys/xtensa/sys/errno.h
 new file mode 100644
-index 0000000..90dd78d
+index 000000000..90dd78d22
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/sys/errno.h
 @@ -0,0 +1,175 @@
@@ -17062,7 +17062,7 @@ index 0000000..90dd78d
 +#endif /* _SYS_ERRNO_H */
 diff --git a/newlib/libc/sys/xtensa/sys/fcntl.h b/newlib/libc/sys/xtensa/sys/fcntl.h
 new file mode 100644
-index 0000000..bc7c41c
+index 000000000..bc7c41c2c
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/sys/fcntl.h
 @@ -0,0 +1,131 @@
@@ -17199,7 +17199,7 @@ index 0000000..bc7c41c
 +#endif	/* !_FCNTL_ */
 diff --git a/newlib/libc/sys/xtensa/sys/file.h b/newlib/libc/sys/xtensa/sys/file.h
 new file mode 100644
-index 0000000..be88c6a
+index 000000000..be88c6a5a
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/sys/file.h
 @@ -0,0 +1,33 @@
@@ -17237,7 +17237,7 @@ index 0000000..be88c6a
 +#define L_XTND  2       /* Seek from end of file.  */
 +#endif
 diff --git a/newlib/libm/Makefile.am b/newlib/libm/Makefile.am
-index bc45816..eba2a08 100644
+index bc458165f..eba2a08b8 100644
 --- a/newlib/libm/Makefile.am
 +++ b/newlib/libm/Makefile.am
 @@ -39,7 +39,30 @@ info_TEXINFOS = libm.texinfo
@@ -17273,7 +17273,7 @@ index bc45816..eba2a08 100644
  stmp-targetdep: force
  	rm -f tmp.texi
 diff --git a/newlib/libm/Makefile.in b/newlib/libm/Makefile.in
-index 86c4a8e..a0e9443 100644
+index 86c4a8e02..a0e9443a2 100644
 --- a/newlib/libm/Makefile.in
 +++ b/newlib/libm/Makefile.in
 @@ -308,8 +308,21 @@ libm_la_LDFLAGS = -Xcompiler -nostdlib
@@ -17336,7 +17336,7 @@ index 86c4a8e..a0e9443 100644
  stmp-targetdep: force
  	rm -f tmp.texi
 diff --git a/newlib/libm/libm.texinfo b/newlib/libm/libm.texinfo
-index f259848..f87f447 100644
+index f25984840..f87f4472a 100644
 --- a/newlib/libm/libm.texinfo
 +++ b/newlib/libm/libm.texinfo
 @@ -1,7 +1,28 @@
@@ -17521,7 +17521,7 @@ index f259848..f87f447 100644
 -
 -
 diff --git a/newlib/libm/machine/configure b/newlib/libm/machine/configure
-index 7096316..0913a49 100755
+index 7096316b6..0913a495d 100755
 --- a/newlib/libm/machine/configure
 +++ b/newlib/libm/machine/configure
 @@ -572,7 +572,7 @@ PACKAGE_STRING='newlib 2.2.0'
@@ -17554,7 +17554,7 @@ index 7096316..0913a49 100755
      machlib=${libm_machine_dir}/lib${libm_machine_dir}.${aext}
 diff --git a/newlib/libm/machine/xtensa/Makefile.am b/newlib/libm/machine/xtensa/Makefile.am
 new file mode 100644
-index 0000000..576fe77
+index 000000000..576fe7752
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/Makefile.am
 @@ -0,0 +1,21 @@
@@ -17581,7 +17581,7 @@ index 0000000..576fe77
 +CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 diff --git a/newlib/libm/machine/xtensa/Makefile.in b/newlib/libm/machine/xtensa/Makefile.in
 new file mode 100644
-index 0000000..cc7bab3
+index 000000000..cc7bab3fc
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/Makefile.in
 @@ -0,0 +1,467 @@
@@ -18054,7 +18054,7 @@ index 0000000..cc7bab3
 +.NOEXPORT:
 diff --git a/newlib/libm/machine/xtensa/aclocal.m4 b/newlib/libm/machine/xtensa/aclocal.m4
 new file mode 100644
-index 0000000..87c0e78
+index 000000000..87c0e78bc
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/aclocal.m4
 @@ -0,0 +1,880 @@
@@ -18940,7 +18940,7 @@ index 0000000..87c0e78
 +m4_include([../../../acinclude.m4])
 diff --git a/newlib/libm/machine/xtensa/configure b/newlib/libm/machine/xtensa/configure
 new file mode 100755
-index 0000000..339390d
+index 000000000..339390db7
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/configure
 @@ -0,0 +1,4623 @@
@@ -23569,7 +23569,7 @@ index 0000000..339390d
 +
 diff --git a/newlib/libm/machine/xtensa/configure.in b/newlib/libm/machine/xtensa/configure.in
 new file mode 100644
-index 0000000..0ad5df5
+index 000000000..0ad5df51e
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/configure.in
 @@ -0,0 +1,14 @@
@@ -23589,7 +23589,7 @@ index 0000000..0ad5df5
 +AC_OUTPUT
 diff --git a/newlib/libm/machine/xtensa/feclearexcept.c b/newlib/libm/machine/xtensa/feclearexcept.c
 new file mode 100644
-index 0000000..9ed5ac6
+index 000000000..9ed5ac658
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/feclearexcept.c
 @@ -0,0 +1,49 @@
@@ -23644,7 +23644,7 @@ index 0000000..9ed5ac6
 +#endif
 diff --git a/newlib/libm/machine/xtensa/fegetenv.c b/newlib/libm/machine/xtensa/fegetenv.c
 new file mode 100644
-index 0000000..a4afbe0
+index 000000000..a4afbe0c0
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/fegetenv.c
 @@ -0,0 +1,56 @@
@@ -23706,7 +23706,7 @@ index 0000000..a4afbe0
 +#endif
 diff --git a/newlib/libm/machine/xtensa/fegetexcept.c b/newlib/libm/machine/xtensa/fegetexcept.c
 new file mode 100644
-index 0000000..250917c
+index 000000000..250917c3e
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/fegetexcept.c
 @@ -0,0 +1,67 @@
@@ -23779,7 +23779,7 @@ index 0000000..250917c
 +#endif
 diff --git a/newlib/libm/machine/xtensa/fegetexceptflag.c b/newlib/libm/machine/xtensa/fegetexceptflag.c
 new file mode 100644
-index 0000000..fa3c7e3
+index 000000000..fa3c7e39c
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/fegetexceptflag.c
 @@ -0,0 +1,64 @@
@@ -23849,7 +23849,7 @@ index 0000000..fa3c7e3
 +#endif
 diff --git a/newlib/libm/machine/xtensa/fegetround.c b/newlib/libm/machine/xtensa/fegetround.c
 new file mode 100644
-index 0000000..f17be6d
+index 000000000..f17be6dc1
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/fegetround.c
 @@ -0,0 +1,50 @@
@@ -23905,7 +23905,7 @@ index 0000000..f17be6d
 +#endif
 diff --git a/newlib/libm/machine/xtensa/feholdexcept.c b/newlib/libm/machine/xtensa/feholdexcept.c
 new file mode 100644
-index 0000000..5457d60
+index 000000000..5457d6010
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/feholdexcept.c
 @@ -0,0 +1,55 @@
@@ -23966,7 +23966,7 @@ index 0000000..5457d60
 +#endif
 diff --git a/newlib/libm/machine/xtensa/feraiseexcept.c b/newlib/libm/machine/xtensa/feraiseexcept.c
 new file mode 100644
-index 0000000..3c0e39d
+index 000000000..3c0e39d11
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/feraiseexcept.c
 @@ -0,0 +1,50 @@
@@ -24022,7 +24022,7 @@ index 0000000..3c0e39d
 +#endif
 diff --git a/newlib/libm/machine/xtensa/fetestexcept.c b/newlib/libm/machine/xtensa/fetestexcept.c
 new file mode 100644
-index 0000000..2950859
+index 000000000..295085949
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/fetestexcept.c
 @@ -0,0 +1,41 @@
@@ -24069,7 +24069,7 @@ index 0000000..2950859
 +#endif
 diff --git a/newlib/libm/machine/xtensa/feupdateenv.c b/newlib/libm/machine/xtensa/feupdateenv.c
 new file mode 100644
-index 0000000..68d671c
+index 000000000..68d671c72
 --- /dev/null
 +++ b/newlib/libm/machine/xtensa/feupdateenv.c
 @@ -0,0 +1,45 @@
@@ -24119,7 +24119,7 @@ index 0000000..68d671c
 +
 +#endif
 diff --git a/newlib/libm/math/e_fmod.c b/newlib/libm/math/e_fmod.c
-index f9739ee..57ad264 100644
+index f9739eec2..57ad26412 100644
 --- a/newlib/libm/math/e_fmod.c
 +++ b/newlib/libm/math/e_fmod.c
 @@ -11,15 +11,57 @@
@@ -24191,7 +24191,7 @@ index f9739ee..57ad264 100644
 +
  #endif /* defined(_DOUBLE_IS_32BITS) */
 diff --git a/newlib/libm/math/e_remainder.c b/newlib/libm/math/e_remainder.c
-index ae7ce64..aca3e6c 100644
+index ae7ce649a..aca3e6ce0 100644
 --- a/newlib/libm/math/e_remainder.c
 +++ b/newlib/libm/math/e_remainder.c
 @@ -24,6 +24,10 @@
@@ -24213,7 +24213,7 @@ index ae7ce64..aca3e6c 100644
 +
  #endif /* defined(_DOUBLE_IS_32BITS) */
 diff --git a/newlib/libm/math/e_sqrt.c b/newlib/libm/math/e_sqrt.c
-index 460125a..cd65b62 100644
+index 460125a8f..cd65b62c9 100644
 --- a/newlib/libm/math/e_sqrt.c
 +++ b/newlib/libm/math/e_sqrt.c
 @@ -81,6 +81,7 @@
@@ -24250,7 +24250,7 @@ index 460125a..cd65b62 100644
   */
 +
 diff --git a/newlib/libm/math/ef_fmod.c b/newlib/libm/math/ef_fmod.c
-index 53c1ba2..1454086 100644
+index 53c1ba280..1454086cc 100644
 --- a/newlib/libm/math/ef_fmod.c
 +++ b/newlib/libm/math/ef_fmod.c
 @@ -13,14 +13,54 @@
@@ -24318,7 +24318,7 @@ index 53c1ba2..1454086 100644
 +#endif
 +
 diff --git a/newlib/libm/math/ef_remainder.c b/newlib/libm/math/ef_remainder.c
-index 23d29d0..5371009 100644
+index 23d29d05a..5371009fc 100644
 --- a/newlib/libm/math/ef_remainder.c
 +++ b/newlib/libm/math/ef_remainder.c
 @@ -15,6 +15,10 @@
@@ -24339,7 +24339,7 @@ index 23d29d0..5371009 100644
 +
 +#endif /* 0 */
 diff --git a/newlib/libm/math/ef_sqrt.c b/newlib/libm/math/ef_sqrt.c
-index 80e7f36..a6cd13f 100644
+index 80e7f360e..a6cd13f02 100644
 --- a/newlib/libm/math/ef_sqrt.c
 +++ b/newlib/libm/math/ef_sqrt.c
 @@ -13,6 +13,11 @@
@@ -24371,7 +24371,7 @@ index 80e7f36..a6cd13f 100644
 +#endif /* !XCHAL_HAVE_FP_SQRT */
 +
 diff --git a/newlib/libm/math/w_fmod.c b/newlib/libm/math/w_fmod.c
-index 47d1dd0..1277350 100644
+index 47d1dd081..1277350bf 100644
 --- a/newlib/libm/math/w_fmod.c
 +++ b/newlib/libm/math/w_fmod.c
 @@ -80,7 +80,7 @@ PORTABILITY
@@ -24384,7 +24384,7 @@ index 47d1dd0..1277350 100644
              exc.type = DOMAIN;
              exc.name = "fmod";
 diff --git a/newlib/libm/math/w_remainder.c b/newlib/libm/math/w_remainder.c
-index e4c1967..4906260 100644
+index e4c196716..4906260fd 100644
 --- a/newlib/libm/math/w_remainder.c
 +++ b/newlib/libm/math/w_remainder.c
 @@ -66,8 +66,8 @@ PORTABILITY
@@ -24399,7 +24399,7 @@ index e4c1967..4906260 100644
              exc.type = DOMAIN;
              exc.name = "remainder";
 diff --git a/newlib/libm/math/wf_fmod.c b/newlib/libm/math/wf_fmod.c
-index 030ca3e..63b548e 100644
+index 030ca3e7a..63b548eba 100644
 --- a/newlib/libm/math/wf_fmod.c
 +++ b/newlib/libm/math/wf_fmod.c
 @@ -34,7 +34,7 @@
@@ -24412,7 +24412,7 @@ index 030ca3e..63b548e 100644
              exc.type = DOMAIN;
              exc.name = "fmodf";
 diff --git a/newlib/libm/math/wf_remainder.c b/newlib/libm/math/wf_remainder.c
-index f38c237..b44f212 100644
+index f38c23785..b44f212cd 100644
 --- a/newlib/libm/math/wf_remainder.c
 +++ b/newlib/libm/math/wf_remainder.c
 @@ -33,8 +33,8 @@
@@ -24427,5 +24427,5 @@ index f38c237..b44f212 100644
              exc.type = DOMAIN;
              exc.name = "remainderf";
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

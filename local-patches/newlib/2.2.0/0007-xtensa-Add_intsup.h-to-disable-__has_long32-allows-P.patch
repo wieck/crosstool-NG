@@ -1,7 +1,7 @@
 From 45ed90066c88c055c98a35f73947ed451fb01244 Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Wed, 9 Sep 2015 16:18:10 +1000
-Subject: [PATCH 07/21] xtensa: Add_intsup.h to disable __has_long32, allows
+Subject: [PATCH 07/22] xtensa: Add_intsup.h to disable __has_long32, allows
  PRI_32 & some limit constants to work correctly
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH 07/21] xtensa: Add_intsup.h to disable __has_long32, allows
 
 diff --git a/newlib/libc/sys/xtensa/sys/_intsup.h b/newlib/libc/sys/xtensa/sys/_intsup.h
 new file mode 100644
-index 0000000..fa78426
+index 000000000..fa78426c5
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/sys/_intsup.h
 @@ -0,0 +1,20 @@
@@ -36,5 +36,5 @@ index 0000000..fa78426
 +
 +#endif /* _SYS__INTSUP_H */
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

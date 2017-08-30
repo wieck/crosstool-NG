@@ -1,14 +1,14 @@
 From c8ce0848abef4fa144d040f64fa1f2ebe032ca41 Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Sat, 14 May 2016 18:35:26 +0800
-Subject: [PATCH 13/21] Fix configuration overlay
+Subject: [PATCH 13/22] Fix configuration overlay
 
 ---
  .../sys/xtensa/include/xtensa/config/core-isa.h    | 477 ++++++++++++++-------
  1 file changed, 332 insertions(+), 145 deletions(-)
 
 diff --git a/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h b/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
-index 612fbf8..e013722 100644
+index 612fbf840..e01372285 100644
 --- a/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
 +++ b/newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
 @@ -7,7 +7,7 @@
@@ -674,5 +674,5 @@ index 612fbf8..e013722 100644
  
  /*----------------------------------------------------------------------
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

@@ -1,7 +1,7 @@
 From 380184b806b2468ddc451ef41734cfef7b501ab7 Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Tue, 24 May 2016 20:20:27 +0800
-Subject: [PATCH 16/21] Make sure _impure_ptr and _impure_data are not defined
+Subject: [PATCH 16/22] Make sure _impure_ptr and _impure_data are not defined
  when __DYNAMIC_REENT__ is used
 
 ---
@@ -12,7 +12,7 @@ Subject: [PATCH 16/21] Make sure _impure_ptr and _impure_data are not defined
  4 files changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/newlib/libc/include/sys/reent.h b/newlib/libc/include/sys/reent.h
-index ce5b3ed..bb52ae6 100644
+index ce5b3eda7..bb52ae65f 100644
 --- a/newlib/libc/include/sys/reent.h
 +++ b/newlib/libc/include/sys/reent.h
 @@ -759,8 +759,11 @@ struct _reent
@@ -29,7 +29,7 @@ index ce5b3ed..bb52ae6 100644
  void _reclaim_reent _PARAMS ((struct _reent *));
  
 diff --git a/newlib/libc/machine/spu/impure.c b/newlib/libc/machine/spu/impure.c
-index 5fbe0e5..3a9f6fb 100644
+index 5fbe0e5f5..3a9f6fb7e 100644
 --- a/newlib/libc/machine/spu/impure.c
 +++ b/newlib/libc/machine/spu/impure.c
 @@ -9,6 +9,8 @@
@@ -43,7 +43,7 @@ index 5fbe0e5..3a9f6fb 100644
 +#endif
 +struct _reent *_CONST __ATTRIBUTE_IMPURE_PTR__ _global_impure_ptr = NULL;
 diff --git a/newlib/libc/reent/impure.c b/newlib/libc/reent/impure.c
-index f5918c8..f393f7a 100644
+index f5918c88f..f393f7a58 100644
 --- a/newlib/libc/reent/impure.c
 +++ b/newlib/libc/reent/impure.c
 @@ -20,9 +20,13 @@ extern const struct __sFILE_fake __sf_fake_stdout _ATTRIBUTE ((weak));
@@ -62,7 +62,7 @@ index f5918c8..f393f7a 100644
 +#endif
 +struct _reent * __ATTRIBUTE_IMPURE_PTR__ _global_impure_ptr = NULL;
 diff --git a/newlib/libc/reent/reent.c b/newlib/libc/reent/reent.c
-index b6c2abf..c6103c5 100644
+index b6c2abf02..c6103c59b 100644
 --- a/newlib/libc/reent/reent.c
 +++ b/newlib/libc/reent/reent.c
 @@ -45,7 +45,7 @@ void
@@ -75,5 +75,5 @@ index b6c2abf..c6103c5 100644
        /* used by mprec routines. */
  #ifdef _REENT_SMALL
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

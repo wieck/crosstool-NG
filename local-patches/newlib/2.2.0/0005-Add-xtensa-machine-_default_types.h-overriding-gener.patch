@@ -1,7 +1,7 @@
 From 007777696321407ffd8924fe3e6f6f4103e0f20a Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Sat, 5 Sep 2015 12:42:30 +1000
-Subject: [PATCH 05/21] Add xtensa/machine/_default_types.h overriding generic
+Subject: [PATCH 05/22] Add xtensa/machine/_default_types.h overriding generic
 
 Defines uint32_t/int32_t as int not long, even if gcc's __INT32_TYPE__ is long.
 
@@ -13,7 +13,7 @@ Signed-off-by: Angus Gratton <gus@projectgus.com>
 
 diff --git a/newlib/libc/sys/xtensa/include/machine/_default_types.h b/newlib/libc/sys/xtensa/include/machine/_default_types.h
 new file mode 100644
-index 0000000..1d55697
+index 000000000..1d5569786
 --- /dev/null
 +++ b/newlib/libc/sys/xtensa/include/machine/_default_types.h
 @@ -0,0 +1,52 @@
@@ -70,5 +70,5 @@ index 0000000..1d55697
 +
 +#endif /* _MACHINE__DEFAULT_TYPES_H */
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

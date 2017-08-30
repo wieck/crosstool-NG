@@ -1,7 +1,7 @@
 From ac49670377411f4be9f5e9532b39741377e062c5 Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Tue, 24 May 2016 20:08:39 +0800
-Subject: [PATCH 15/21] Move xtensa-specific stuff to global config
+Subject: [PATCH 15/22] Move xtensa-specific stuff to global config
 
 ---
  newlib/libc/include/sys/config.h        |  7 +++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 15/21] Move xtensa-specific stuff to global config
  2 files changed, 7 insertions(+), 19 deletions(-)
 
 diff --git a/newlib/libc/include/sys/config.h b/newlib/libc/include/sys/config.h
-index f6f923e..b5adfe1 100644
+index f6f923ecb..b5adfe102 100644
 --- a/newlib/libc/include/sys/config.h
 +++ b/newlib/libc/include/sys/config.h
 @@ -190,6 +190,13 @@
@@ -27,7 +27,7 @@ index f6f923e..b5adfe1 100644
  
  /* This block should be kept in sync with GCC's limits.h.  The point
 diff --git a/newlib/libc/sys/xtensa/include/config.h b/newlib/libc/sys/xtensa/include/config.h
-index a0854dd..69d49ad 100644
+index a0854dd9b..69d49adf9 100644
 --- a/newlib/libc/sys/xtensa/include/config.h
 +++ b/newlib/libc/sys/xtensa/include/config.h
 @@ -4,25 +4,6 @@
@@ -57,5 +57,5 @@ index a0854dd..69d49ad 100644
  #define __EXPORT
  #endif
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

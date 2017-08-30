@@ -1,7 +1,7 @@
 From ccbf4ae81ce694bb8e70206a4e0c7dc90625e6fa Mon Sep 17 00:00:00 2001
 From: Angus Gratton <gus@projectgus.com>
 Date: Wed, 15 Jul 2015 13:32:21 +1000
-Subject: [PATCH 03/21] xtensa: enable sqrt
+Subject: [PATCH 03/22] xtensa: enable sqrt
 
 There's no sqrt in xtensa libgcc, so enable it in libm.
 
@@ -11,7 +11,7 @@ Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
  1 file changed, 6 deletions(-)
 
 diff --git a/newlib/libm/math/e_sqrt.c b/newlib/libm/math/e_sqrt.c
-index cd65b62..e21c301 100644
+index cd65b62c9..e21c301d9 100644
 --- a/newlib/libm/math/e_sqrt.c
 +++ b/newlib/libm/math/e_sqrt.c
 @@ -92,10 +92,6 @@ static	const double	one	= 1.0, tiny=1.0e-300;
@@ -35,5 +35,5 @@ index cd65b62..e21c301 100644
  
  /*
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 

@@ -1,14 +1,14 @@
 From 19743eac19bc068fcc813823c24b71fad28134bb Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Thu, 26 May 2016 14:02:29 +0800
-Subject: [PATCH 18/21] Don't initialize environ by default
+Subject: [PATCH 18/22] Don't initialize environ by default
 
 ---
  newlib/libc/stdlib/environ.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/newlib/libc/stdlib/environ.c b/newlib/libc/stdlib/environ.c
-index 8cc2392..abe58fd 100644
+index 8cc239237..abe58fd90 100644
 --- a/newlib/libc/stdlib/environ.c
 +++ b/newlib/libc/stdlib/environ.c
 @@ -28,9 +28,13 @@
@@ -27,5 +27,5 @@ index 8cc2392..abe58fd 100644
 +char **environ = 0; 
 +#endif
 -- 
-2.10.1 (Apple Git-78)
+2.11.0 (Apple Git-81)
 
