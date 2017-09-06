@@ -2,110 +2,138 @@ stages:
   - build
   - deploy
 
-build_linux:
+# Prepare release name/number
+.get_release_name: &get_release_name |
+  VER_DESC=$(git describe | sed -E -n 's|.*crosstool-ng-([0-9]+).([0-9]+).([0-9]+)-([0-9]+)-g([0-9a-f]{7}).*|\1.\2.\3-\4-g\5|gp')
+  REL_NAME=xtensa-esp32-elf-${PLATFORM_NAME}-${VER_DESC}-5.2.0
+  echo "PLATFORM_NAME: $PLATFORM_NAME"
+  echo "VER_DESC: $VER_DESC"
+  echo "REL_NAME: $REL_NAME"
+
+
+# Configure and install crosstool-NG
+.build_ctng: &build_ctng |
+  ./bootstrap
+  ./configure --enable-local
+  make install
+  ./ct-ng xtensa-esp32-elf
+
+# ct-ng options common for all platforms
+.configure_common: &configure_common |
+  echo "# CT_LOG_PROGRESS_BAR is not set" >> .config
+  echo "# CT_INSTALL_DIR_RO is not set" >> .config
+  echo "CT_LOG_EXTRA=y" >> .config
+  echo "CT_LOG_LEVEL_MAX=\"EXTRA\"" >> .config
+
+# Configuration specific to Docker
+.configure_docker: &configure_docker |
+  echo "CT_ALLOW_BUILD_AS_ROOT=y" >> .config
+  echo "CT_ALLOW_BUILD_AS_ROOT_SURE=y" >> .config  
+
+# Download tarballs and extract them into build directory
+.get_tarballs: &get_tarballs |
+  wget https://ci.espressif.cn:42348/cache/ct-ng-tarballs.tar
+  test "$(shasum -a 256 ct-ng-tarballs.tar | cut -d ' ' -f 1)" = "9b3a5662474bbc53613b6d4d2ef00e7767e0e1c1f20dfed1193654739506a3ce"
+  mkdir -p .build/tarballs
+  cd .build/tarballs
+  tar xvf ../../ct-ng-tarballs.tar
+  cd ../../
+
+# Actual build
+.build_toolchain: &build_toolchain |  
+  ./ct-ng oldconfig
+  ./ct-ng build
+
+# Package the toolchain
+.package_toolchain: &package_toolchain |
+  mkdir -p dist
+  cd builds
+  rm xtensa-esp32-elf/build.log.bz2
+  ${ARCHIVE_TOOL} ${REL_NAME}.${ARCHIVE_EXT} xtensa-esp32-elf/
+  mv ${REL_NAME}.${ARCHIVE_EXT} ../dist/
+
+
+# Common template for all builds
+.build_template: &build_template
   stage: build
-  image: $CI_DOCKER_REGISTRY/esp32-toolchain
-  tags:
-    - build
 
   artifacts:
     paths:
-      - dist
       - .config
-    expire_in: 2 weeks
+      - build.log
+      - dist
+    when: always
+    expire_in: 6 weeks
 
-  variables:
-    GIT_STRATEGY: fetch
-
+.build_template_linux: &build_template_linux
+  <<: *build_template
   script:
-    # Configure and install crosstool-NG
-    - ./bootstrap
-    - ./configure --enable-local
-    - make install
-    # Use xtensa-esp32-elf sample by default
-    - ./ct-ng xtensa-esp32-elf
-    # Override some options
-    - echo "CT_LOG_PROGRESS_BAR=n" >> .config
-    - echo "CT_INSTALL_DIR_RO=y" >> .config
-    - echo "CT_ALLOW_BUILD_AS_ROOT=y" >> .config
-    - echo "CT_ALLOW_BUILD_AS_ROOT_SURE=y" >> .config
-    - echo "CT_LOG_EXTRA=y" >> .config
-    - echo "CT_LOG_LEVEL_MAX=\"EXTRA\"" >> .config
-    # Update .config file
-    - ./ct-ng oldconfig
-    # Download tarballs and place them into the build directory
-    - wget https://ci.espressif.cn:42348/cache/ct-ng-tarballs.tar
-    - test "$(shasum -a 256 ct-ng-tarballs.tar | cut -d ' ' -f 1)" = "9b3a5662474bbc53613b6d4d2ef00e7767e0e1c1f20dfed1193654739506a3ce"
-    - mkdir -p .build/tarballs
-    - cd .build/tarballs
-    - tar xvf ../../ct-ng-tarballs.tar
-    - cd ../../
-    # Run the build
-    - ./ct-ng build
-    # Package the toolchain
-    - export REL_NAME=xtensa-esp32-elf-linux64-`git describe --always`
-    - cd builds
-    - tar czvf ${REL_NAME}.tar.gz xtensa-esp32-elf/
-    - cd ../
-    - mkdir -p dist
-    - mv builds/${REL_NAME}.tar.gz dist/
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
+    - *get_tarballs
+    - *build_toolchain
+    - *package_toolchain
 
 
+build_linux:
+  tags:
+    - build
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain
+  variables:
+    PLATFORM_NAME: "linux64"
+    ARCHIVE_TOOL: "tar czvf"
+    ARCHIVE_EXT: "tar.gz"
+  <<: *build_template_linux
+
+build_linux_x86:
+  tags:
+    - build
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-x86
+  variables:
+    PLATFORM_NAME: "linux32"
+    ARCHIVE_TOOL: "tar czvf"
+    ARCHIVE_EXT: "tar.gz"
+  <<: *build_template_linux
+
+build_macos:
+  tags:
+    - build_macos_case_sensitive
+  variables:
+    PLATFORM_NAME: "macos"
+    ARCHIVE_TOOL: "tar czvf"
+    ARCHIVE_EXT: "tar.gz"
+  <<: *build_template
+  script:
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *get_tarballs
+    - *build_toolchain
+    - *package_toolchain
 
 build_windows:
-  stage: build
-  image: $CI_DOCKER_REGISTRY/esp32-toolchain
   tags:
     - build
-
-  artifacts:
-    paths:
-      - dist
-      - .config
-    expire_in: 2 weeks
-
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain
   variables:
-    GIT_STRATEGY: fetch
-
+    PLATFORM_NAME: "win32"
+    ARCHIVE_TOOL: "zip -r"
+    ARCHIVE_EXT: "zip"
+  <<: *build_template
   script:
-
-    # Configure and install crosstool-NG
-    - ./bootstrap
-    - ./configure --enable-local
-    - make install
-    # Use xtensa-esp32-elf sample by default
-    - ./ct-ng xtensa-esp32-elf
-    # Override some options
-    - echo "CT_LOG_PROGRESS_BAR=n" >> .config
-    - echo "CT_INSTALL_DIR_RO=y" >> .config
-    - echo "CT_ALLOW_BUILD_AS_ROOT=y" >> .config
-    - echo "CT_ALLOW_BUILD_AS_ROOT_SURE=y" >> .config
-    - echo "CT_LOG_EXTRA=y" >> .config
-    - echo "CT_LOG_LEVEL_MAX=\"EXTRA\"" >> .config
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
     # Override options specific for Windows
     - echo "CT_CANADIAN=y" >> .config
-    - echo "CT_WANTS_STATIC_LINK=y" >> .config
-    - echo "CT_STATIC_TOOLCHAIN=y" >> .config
     - echo "CT_HOST=\"i686-pc-mingw32\"" >> .config
     - echo "CT_HOST_PREFIX=\"i686-w64-mingw32-\"" >> .config
     - echo "CT_HOST_SUFFIX=\"\"" >> .config
-    - echo "CT_GDB_CROSS_STATIC=y" >> .config
     - echo "# CT_GDB_CROSS_PYTHON is not set" >> .config
-    # Update .config file
-    - ./ct-ng oldconfig
-    # Download tarballs and place them into the build directory
-    - wget https://ci.espressif.cn:42348/cache/ct-ng-tarballs.tar
-    - test "$(shasum -a 256 ct-ng-tarballs.tar | cut -d ' ' -f 1)" = "9b3a5662474bbc53613b6d4d2ef00e7767e0e1c1f20dfed1193654739506a3ce"
-    - mkdir -p .build/tarballs
-    - cd .build/tarballs
-    - tar xvf ../../ct-ng-tarballs.tar
-    - cd ../../
-    # Run the build
-    - ./ct-ng build
-    # Package the toolchain
-    - export REL_NAME=xtensa-esp32-elf-win32-`git describe --always`
-    - cd builds
-    - zip -r ${REL_NAME}.zip xtensa-esp32-elf/
-    - cd ../
-    - mkdir -p dist
-    - mv builds/${REL_NAME}.zip dist/
+    - *get_tarballs
+    - *build_toolchain
+    - *package_toolchain
+
