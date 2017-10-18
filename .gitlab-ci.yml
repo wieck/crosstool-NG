@@ -40,7 +40,7 @@ stages:
   cd ../../
 
 # Actual build
-.build_toolchain: &build_toolchain |  
+.build_toolchain: &build_toolchain |
   ./ct-ng oldconfig
   ./ct-ng build
 
@@ -51,6 +51,7 @@ stages:
   rm xtensa-esp32-elf/build.log.bz2
   ${ARCHIVE_TOOL} ${REL_NAME}.${ARCHIVE_EXT} xtensa-esp32-elf/
   mv ${REL_NAME}.${ARCHIVE_EXT} ../dist/
+  cd ../
 
 
 # Common template for all builds
@@ -75,6 +76,15 @@ stages:
     - *get_tarballs
     - *build_toolchain
     - *package_toolchain
+    - echo "CT_CC_GCC_ENABLE_CXX_FLAGS=\"-fno-rtti -ffunction-sections -mfix-esp32-psram-cache-issue\"" >> .config
+    - rm -rf .build/
+    - mkdir -p .build/tarballs
+    - cd .build/tarballs
+    - tar xvf ../../ct-ng-tarballs.tar
+    - cd ../../
+    - ./ct-ng oldconfig
+    - ./ct-ng build
+    - cp builds/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/lib/libstdc++.a dist/libstdc++-psram-workaround.a
 
 
 build_linux:
