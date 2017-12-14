@@ -1,7 +1,7 @@
 From c4a7c414b80767a8490e3cffffd97dfa77209285 Mon Sep 17 00:00:00 2001
 From: jcmvbkbc <jcmvbkbc@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Tue, 1 Nov 2016 17:16:33 +0000
-Subject: [PATCH 04/12] xtensa: Fix PR target/78118
+Subject: [PATCH 04/13] xtensa: Fix PR target/78118
 
 It started failing after the following commit: 32e90dc6a0cda45 ("PR
 rtl-optimization/61047").
