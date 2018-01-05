@@ -25,6 +25,10 @@ stages:
   echo "CT_LOG_EXTRA=y" >> .config
   echo "CT_LOG_LEVEL_MAX=\"EXTRA\"" >> .config
 
+# If PIE is enabled by default in build GCC, add a flag to disable it
+.configure_linux_no_pie: &configure_linux_no_pie |
+  gcc -v |& grep -- --enable-default-pie > /dev/null && echo "CT_EXTRA_LDFLAGS_FOR_HOST=\"-no-pie\"" >> .config
+
 # Configuration specific to Docker
 .configure_docker: &configure_docker |
   echo "CT_ALLOW_BUILD_AS_ROOT=y" >> .config
@@ -50,6 +54,7 @@ stages:
   cd builds
   rm xtensa-esp32-elf/build.log.bz2
   ${ARCHIVE_TOOL} ${REL_NAME}.${ARCHIVE_EXT} xtensa-esp32-elf/
+  ls -l
   mv ${REL_NAME}.${ARCHIVE_EXT} ../dist/
   cd ../
 
@@ -73,19 +78,10 @@ stages:
     - *build_ctng
     - *configure_common
     - *configure_docker
+    - *configure_linux_no_pie
     - *get_tarballs
     - *build_toolchain
     - *package_toolchain
-    - echo "CT_CC_GCC_ENABLE_CXX_FLAGS=\"-fno-rtti -ffunction-sections -mfix-esp32-psram-cache-issue\"" >> .config
-    - rm -rf .build/
-    - mkdir -p .build/tarballs
-    - cd .build/tarballs
-    - tar xvf ../../ct-ng-tarballs.tar
-    - cd ../../
-    - ./ct-ng oldconfig
-    - ./ct-ng build
-    - cp builds/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/lib/libstdc++.a dist/libstdc++-psram-workaround.a
-
 
 build_linux:
   tags:
@@ -111,7 +107,7 @@ build_macos:
   tags:
     - build_macos_case_sensitive
   variables:
-    PLATFORM_NAME: "macos"
+    PLATFORM_NAME: "osx"
     ARCHIVE_TOOL: "tar czvf"
     ARCHIVE_EXT: "tar.gz"
   <<: *build_template
@@ -126,11 +122,11 @@ build_macos:
 build_windows:
   tags:
     - build
-  image: $CI_DOCKER_REGISTRY/esp32-toolchain
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-win-cross
   variables:
     PLATFORM_NAME: "win32"
-    ARCHIVE_TOOL: "zip -r"
-    ARCHIVE_EXT: "zip"
+    ARCHIVE_TOOL: "tar czvf"
+    ARCHIVE_EXT: "tar.gz"
   <<: *build_template
   script:
     - *get_release_name
