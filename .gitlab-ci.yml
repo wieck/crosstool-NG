@@ -1,11 +1,15 @@
 stages:
   - build
-  - deploy
+  - test
 
 variables:
+  MAKEFLAGS: "-j5 --no-keep-going"
+
   CONF_BUILD: "x86_64-linux-gnu"
   CONF_TARGET: "xtensa-esp32-elf"
+
   ARCHIVE_TOOL: "tar czvf"
+  UNARCHIVE_TOOL: "tar xvf"
   ARCHIVE_EXT: "tar.gz"
 
   TARBALL_NAME: ct-ng-v1.22.0-tarballs-1.tar
@@ -14,14 +18,23 @@ variables:
 before_script:
   - set -o errexit; set -o pipefail; set -o nounset
 
+# Add a key to clone from GITLAB_SSH_SERVER
+.add_gitlab_key: &add_gitlab_key |
+  command -v ssh-agent >/dev/null
+  eval $(ssh-agent -s)
+  printf '%s\n' "${GITLAB_KEY}" | tr -d '\r' | ssh-add - > /dev/null
+  mkdir -p ~/.ssh && chmod 700 ~/.ssh
+  [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config || true
+
 # Prepare release name/number
 .get_release_name: &get_release_name |
   VER_DESC=$(git describe | sed -E -n 's|.*crosstool-ng-([0-9]+).([0-9]+).([0-9]+)-([0-9]+)-g([0-9a-f]{7}).*|\1.\2.\3-\4-g\5|gp')
   REL_NAME=xtensa-esp32-elf-${PLATFORM_NAME}-${VER_DESC}-5.2.0
+  ARCHIVE_NAME=${REL_NAME}.${ARCHIVE_EXT}
   echo "PLATFORM_NAME: $PLATFORM_NAME"
   echo "VER_DESC: $VER_DESC"
   echo "REL_NAME: $REL_NAME"
-
+  echo "ARCHIVE_NAME: $ARCHIVE_NAME"
 
 # Configure and install crosstool-NG
 .build_ctng: &build_ctng |
@@ -82,11 +95,12 @@ before_script:
   mkdir -p dist
   cd builds
   rm ${CONF_TARGET}/build.log.bz2
-  ${ARCHIVE_TOOL} ${REL_NAME}.${ARCHIVE_EXT} ${CONF_TARGET}/
+  ${ARCHIVE_TOOL} ${ARCHIVE_NAME} ${CONF_TARGET}/
   ls -l
-  mv ${REL_NAME}.${ARCHIVE_EXT} ../dist/
+  mv ${ARCHIVE_NAME} ../dist/
+  echo "${ARCHIVE_NAME}" > ../dist/archive_name
   cd ../
-  #TODO generate checksum
+  #TODO generate checksum so that users can use them
 
 # Common template for all builds
 .build_template: &build_template
@@ -177,3 +191,29 @@ build_linux_armel:
     - *get_tarballs
     - *build_toolchain
     - *package_toolchain
+
+test_arm_rpi:
+  stage: test
+  tags:
+    - rpi-shell
+  dependencies:
+    - build_linux_armel
+  # It allows failure because the RPi runner is not stable
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+    IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
+  script:
+    - pwd; id; uname -a
+    - ARCHIVE_NAME=$(cat dist/archive_name)
+    - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
+    - file xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
+    - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
+    - *add_gitlab_key
+    - git clone ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
+    - cd ${IDF_PATH}
+    - ./tools/ci/mirror-submodule-update.sh
+    - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
+    - cd ${IDF_PATH}/examples/get-started/hello_world
+    - make defconfig
+    - make
