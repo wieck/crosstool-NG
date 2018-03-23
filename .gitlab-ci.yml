@@ -137,7 +137,7 @@ build_linux_x86:
   variables:
     PLATFORM_NAME: "linux32"
 
-build_macos:
+.build_macos:
   <<: *build_template
   tags:
     - build_macos_case_sensitive
