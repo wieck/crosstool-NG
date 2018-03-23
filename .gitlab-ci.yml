@@ -12,8 +12,8 @@ variables:
   UNARCHIVE_TOOL: "tar xvf"
   ARCHIVE_EXT: "tar.gz"
 
-  TARBALL_NAME: ct-ng-v1.22.0-tarballs-1.tar
-# Local tarball address is TARBALL_URL
+  TARBALLS_NAME: ct-ng-v1.22.0-tarballs-1.tar
+# Local tarball address is TARBALLS_URL
 
 before_script:
   - set -o errexit; set -o pipefail; set -o nounset
@@ -76,13 +76,13 @@ before_script:
 # Download tarballs and extract them into build directory
 .get_tarballs: &get_tarballs |
   echo Downloading tarballs...
-  wget --no-verbose ${TARBALL_URL}/${TARBALL_NAME}
-  wget --no-verbose ${TARBALL_URL}/${TARBALL_NAME}.sha256
+  wget --no-verbose ${TARBALLS_URL}/${TARBALLS_NAME}
+  wget --no-verbose ${TARBALLS_URL}/${TARBALLS_NAME}.sha256
   echo Checking sum...
-  sha256sum -c ${TARBALL_NAME}.sha256 || exit 1
+  sha256sum -c ${TARBALLS_NAME}.sha256 || exit 1
   mkdir -p .build/tarballs
   pushd .build/tarballs
-  tar xvf ../../${TARBALL_NAME}
+  tar xvf ../../${TARBALLS_NAME}
   popd
 
 # Actual build
@@ -93,14 +93,12 @@ before_script:
 # Package the toolchain
 .package_toolchain: &package_toolchain |
   mkdir -p dist
-  cd builds
+  pushd builds
   rm ${CONF_TARGET}/build.log.bz2
   ${ARCHIVE_TOOL} ${ARCHIVE_NAME} ${CONF_TARGET}/
-  ls -l
   mv ${ARCHIVE_NAME} ../dist/
-  echo "${ARCHIVE_NAME}" > ../dist/archive_name
-  cd ../
-  #TODO generate checksum so that users can use them
+  echo "${ARCHIVE_NAME}" > ../dist/archive_name_${PLATFORM_NAME}
+  popd
 
 # Common template for all builds
 .build_template: &build_template
@@ -203,14 +201,16 @@ test_arm_rpi:
   variables:
     GIT_STRATEGY: none
     IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
+    PLATFORM_NAME: "linux-armel"
   script:
     - pwd; id; uname -a
-    - ARCHIVE_NAME=$(cat dist/archive_name)
+    - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
     - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
     - file xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
     - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
     - *add_gitlab_key
-    - git clone ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
+    - rm -rf ${IDF_PATH}
+    - git clone --depth 1 ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
     - cd ${IDF_PATH}
     - ./tools/ci/mirror-submodule-update.sh
     - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
