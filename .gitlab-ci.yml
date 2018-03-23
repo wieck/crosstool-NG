@@ -137,17 +137,23 @@ build_linux_x86:
   variables:
     PLATFORM_NAME: "linux32"
 
-.build_macos:
+build_macos:
   <<: *build_template
-  tags:
-    - build_macos_case_sensitive
+  image: ci.espressif.cn:42348/esp32-toolchain-macos-cross
   variables:
-    PLATFORM_NAME: "osx"
+    CONF_HOST: "x86_64-apple-darwin12"
+    PLATFORM_NAME: "macos"
   script:
     - *get_release_name
     - *build_ctng
     - *configure_common
+    - *configure_docker
+    - *configure_crossbuild
     - *get_tarballs
+
+    # To work around the issue ".build/src/gcc-5.2.0/gcc/system.h:493:20: fatal error: malloc.h: No such file or directory"
+    - ln -s -r /opt/osxcross/target/SDK/MacOSX10.8.sdk/usr/include/{malloc/,}malloc.h
+
     - *build_toolchain
     - *package_toolchain
 
