@@ -1,0 +1,225 @@
+stages:
+  - build
+  - test
+
+variables:
+  MAKEFLAGS: "-j5 --no-keep-going"
+
+  CONF_BUILD: "x86_64-linux-gnu"
+  CONF_TARGET: "xtensa-esp32-elf"
+
+  ARCHIVE_TOOL: "tar czvf"
+  UNARCHIVE_TOOL: "tar xvf"
+  ARCHIVE_EXT: "tar.gz"
+
+  TARBALLS_NAME: ct-ng-v1.22.0-tarballs-1.tar
+# Local tarball address is TARBALLS_URL
+
+before_script:
+  - set -o errexit; set -o pipefail; set -o nounset
+
+# Add a key to clone from GITLAB_SSH_SERVER
+.add_gitlab_key: &add_gitlab_key |
+  command -v ssh-agent >/dev/null
+  eval $(ssh-agent -s)
+  printf '%s\n' "${GITLAB_KEY}" | tr -d '\r' | ssh-add - > /dev/null
+  mkdir -p ~/.ssh && chmod 700 ~/.ssh
+  [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config || true
+
+# Prepare release name/number
+.get_release_name: &get_release_name |
+  VER_DESC=$(git describe | sed -E -n 's|.*crosstool-ng-([0-9]+).([0-9]+).([0-9]+)-([0-9]+)-g([0-9a-f]{7}).*|\1.\2.\3-\4-g\5|gp')
+  REL_NAME=xtensa-esp32-elf-${PLATFORM_NAME}-${VER_DESC}-5.2.0
+  ARCHIVE_NAME=${REL_NAME}.${ARCHIVE_EXT}
+  echo "PLATFORM_NAME: $PLATFORM_NAME"
+  echo "VER_DESC: $VER_DESC"
+  echo "REL_NAME: $REL_NAME"
+  echo "ARCHIVE_NAME: $ARCHIVE_NAME"
+
+# Configure and install crosstool-NG
+.build_ctng: &build_ctng |
+  ./bootstrap
+  ./configure --enable-local
+  make
+  ./ct-ng ${CONF_TARGET}
+
+# ct-ng options common for all platforms
+.configure_common: &configure_common |
+  echo "# CT_LOG_PROGRESS_BAR is not set" >> .config
+  echo "# CT_INSTALL_DIR_RO is not set" >> .config
+  echo "CT_LOG_EXTRA=y" >> .config
+  echo "CT_LOG_LEVEL_MAX=\"EXTRA\"" >> .config
+
+# Configuration specific to Docker
+.configure_docker: &configure_docker |
+  echo "CT_ALLOW_BUILD_AS_ROOT=y" >> .config
+  echo "CT_ALLOW_BUILD_AS_ROOT_SURE=y" >> .config
+
+# If PIE is enabled by default in build GCC, add a flag to disable it
+.configure_linux_no_pie: &configure_linux_no_pie |
+  gcc -v |& grep -- --enable-default-pie > /dev/null && echo "CT_EXTRA_LDFLAGS_FOR_HOST=\"-no-pie\"" >> .config
+
+# Configuration specific to crossbuilds
+.configure_crossbuild: &configure_crossbuild |
+  echo "CT_CANADIAN=y" >> .config
+  echo "CT_BUILD=\"${CONF_BUILD}\"" >> .config
+  echo "CT_BUILD_PREFIX=\"${CONF_BUILD}-\"" >> .config
+  echo "CT_BUILD_SUFFIX=\"\"" >> .config
+  echo "CT_HOST=\"${CONF_HOST}\"" >> .config
+  echo "CT_HOST_PREFIX=\"${CONF_HOST}-\"" >> .config
+  echo "CT_HOST_SUFFIX=\"\"" >> .config
+
+  # No support Python in GDB in cross-compilation now,
+  # see https://stackoverflow.com/questions/33512541/cross-compiling-gdb-for-arm-with-python-failed#34625177
+  echo "# CT_GDB_CROSS_PYTHON is not set" >> .config
+
+# Download tarballs and extract them into build directory
+.get_tarballs: &get_tarballs |
+  echo Downloading tarballs...
+  wget --no-verbose ${TARBALLS_URL}/${TARBALLS_NAME}
+  wget --no-verbose ${TARBALLS_URL}/${TARBALLS_NAME}.sha256
+  echo Checking sum...
+  sha256sum -c ${TARBALLS_NAME}.sha256 || exit 1
+  mkdir -p .build/tarballs
+  pushd .build/tarballs
+  tar xvf ../../${TARBALLS_NAME}
+  popd
+
+# Actual build
+.build_toolchain: &build_toolchain |
+  ./ct-ng oldconfig
+  ./ct-ng build
+
+# Package the toolchain
+.package_toolchain: &package_toolchain |
+  mkdir -p dist
+  pushd builds
+  rm ${CONF_TARGET}/build.log.bz2
+  ${ARCHIVE_TOOL} ${ARCHIVE_NAME} ${CONF_TARGET}/
+  mv ${ARCHIVE_NAME} ../dist/
+  echo "${ARCHIVE_NAME}" > ../dist/archive_name_${PLATFORM_NAME}
+  popd
+
+# Common template for all builds
+.build_template: &build_template
+  stage: build
+  tags:
+    - build
+  artifacts:
+    paths:
+      - .config
+      - build.log
+      - dist
+    when: always
+    expire_in: 6 weeks
+
+.build_template_linux: &build_template_linux
+  <<: *build_template
+  script:
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
+    - *configure_linux_no_pie
+    - *get_tarballs
+    - *build_toolchain
+    - *package_toolchain
+
+build_linux:
+  <<: *build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain
+  variables:
+    PLATFORM_NAME: "linux64"
+
+build_linux_x86:
+  <<: *build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-x86
+  variables:
+    PLATFORM_NAME: "linux32"
+
+build_macos:
+  <<: *build_template
+  image: ci.espressif.cn:42348/esp32-toolchain-macos-cross
+  variables:
+    CONF_HOST: "x86_64-apple-darwin12"
+    PLATFORM_NAME: "macos"
+  script:
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
+    - *configure_crossbuild
+    - *get_tarballs
+
+    # To work around the issue ".build/src/gcc-5.2.0/gcc/system.h:493:20: fatal error: malloc.h: No such file or directory"
+    - ln -s -r /opt/osxcross/target/SDK/MacOSX10.8.sdk/usr/include/{malloc/,}malloc.h
+
+    - *build_toolchain
+    - *package_toolchain
+
+build_windows:
+  <<: *build_template
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-win-cross
+  variables:
+    CONF_HOST: "i686-w64-mingw32"
+    PLATFORM_NAME: "win32"
+  script:
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
+    - *configure_crossbuild
+    - *get_tarballs
+    - *build_toolchain
+    - *package_toolchain
+
+build_linux_armel:
+  <<: *build_template
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-arm-cross
+  variables:
+    CONF_HOST: "arm-linux-gnueabi"
+    PLATFORM_NAME: "linux-armel"
+  script:
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
+    - *configure_linux_no_pie
+    - *configure_crossbuild
+
+    # To avoid the issue caused by running armel-binary on the armhf platform (RPi3):
+    # "liblto_plugin.so: cannot open shared object file: No such file or directory"
+    # This is a common case for dynamically linked binaries, not specfic liblto_plugin only
+    - echo "CT_STATIC_TOOLCHAIN=y" >> .config
+
+    - *get_tarballs
+    - *build_toolchain
+    - *package_toolchain
+
+test_arm_rpi:
+  stage: test
+  tags:
+    - rpi-shell
+  dependencies:
+    - build_linux_armel
+  # It allows failure because the RPi runner is not stable
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+    IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
+    PLATFORM_NAME: "linux-armel"
+  script:
+    - pwd; id; uname -a
+    - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
+    - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
+    - file xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
+    - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
+    - *add_gitlab_key
+    - rm -rf ${IDF_PATH}
+    - git clone --depth 1 ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
+    - cd ${IDF_PATH}
+    - ./tools/ci/mirror-submodule-update.sh
+    - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
+    - cd ${IDF_PATH}/examples/get-started/hello_world
+    - make defconfig
+    - make
