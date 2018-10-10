@@ -6,19 +6,32 @@ stages:
 image: ${CI_DOCKER_REGISTRY}/esp32-ci-env
 
 variables:
-  MAKEFLAGS: "-j5 --no-keep-going"
+  # GIT_STRATEGY - use option from "CI / CD Settings" - "General pipelines"
+  GIT_SUBMODULE_STRATEGY: none
 
   CONF_BUILD: "x86_64-linux-gnu"
   CONF_TARGET: "xtensa-esp32-elf"
 
-  ARCHIVE_TOOL: "tar cJvf"
+  ARCHIVE_TOOL: "tar cJvf" # 'v' we need to check the contents of the archive by log
   UNARCHIVE_TOOL: "tar xvf"
   ARCHIVE_EXT: "tar.xz"
 
+.use_ci_tools: &use_ci_tools |
+  curl -sSL ${CIT_LOADER_URL} -o cit_loader.sh && sh cit_loader.sh
+  source citools/import_functions
+
+.add_gitlab_key: &add_gitlab_key |
+  cit_add_ssh_key "${GITLAB_KEY}"
+
+.submodules_update: &submodules_update |
+  cit_git_clean_stale_submodules
+  git config submodule.overlays.url $GITLAB_SSH_SERVER/idf/xtensa-overlays.git
+  git submodule update --init
+
 before_script:
-  # Use CI Tools
-  - curl -sSL ${CIT_LOADER_URL} | sh
-  - source citools/import_functions
+  - *use_ci_tools
+  - *add_gitlab_key
+  - *submodules_update
 
 # Prepare release name/number
 .get_release_name: &get_release_name |
@@ -32,7 +45,7 @@ before_script:
   echo "REL_NAME: $REL_NAME"
   echo "ARCHIVE_NAME: $ARCHIVE_NAME"
 
-# Configure and install crosstool-NG
+# Configure crosstool-NG
 .build_ctng: &build_ctng |
   ./bootstrap
   ./configure --enable-local
@@ -57,8 +70,10 @@ before_script:
 .configure_docker: &configure_docker |
   echo "CT_ALLOW_BUILD_AS_ROOT=y" >> .config
   echo "CT_ALLOW_BUILD_AS_ROOT_SURE=y" >> .config
+  echo "CT_CONNECT_TIMEOUT=30" >> .config
 
 # If PIE is enabled by default in build GCC, add a flag to disable it
+# For example, it appears on Ubuntu 17.04 or Debian 9
 .configure_linux_no_pie: &configure_linux_no_pie |
   gcc -v |& grep -- --enable-default-pie > /dev/null && echo "CT_EXTRA_LDFLAGS_FOR_HOST=\"-no-pie\"" >> .config
 
@@ -78,8 +93,6 @@ before_script:
 
 # Actual build
 .build_toolchain: &build_toolchain |
-  # Need to download our branches for GCC, newlib etc
-  cit_add_ssh_key "${GITLAB_KEY}" "$(cit_parse_url_host ${GITLAB_SSH_SERVER})" "$(cit_parse_url_port ${GITLAB_SSH_SERVER})"
   ./ct-ng oldconfig
   ./ct-ng build
 
@@ -96,8 +109,6 @@ before_script:
 # Common template for all builds
 .build_template: &build_template
   stage: build
-  tags:
-    - build
   artifacts:
     paths:
       - .config
@@ -203,6 +214,8 @@ test_arm_rpi:
     GIT_STRATEGY: none
     IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
     PLATFORM_NAME: "linux-armel"
+  before_script:
+    - *use_ci_tools
   script:
     - pwd; id; uname -a
     - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
@@ -222,6 +235,10 @@ test_arm_rpi:
 
 upload_to_http:
   <<: *manual_action
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - *use_ci_tools
   script:
     - cit_add_ssh_key "${HTTP_UPLOAD_KEY}" "$(cit_parse_url_host ${HTTP_UPLOAD_DIR})"
     # List of archives in dist/
