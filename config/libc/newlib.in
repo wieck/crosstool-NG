@@ -232,16 +232,19 @@ config LIBC_NEWLIB_AUX_BUILD_NAME
       Sets identifier and suffix for auxiliary build.
       Libraries become look like "libc_<suffix>.a"
 
-config LIBC_NEWLIB_AUX_BUILD_OPTS
+config LIBC_NEWLIB_AUX_BUILD_EXTRA_CONFIG_ARRAY
     string
     prompt "Configure options for the auxiliary build"
     depends on LIBC_NEWLIB_AUX_BUILD
     help
-      Configure options for the auxiliary build
+      Flags to pass onto ./configure when configuring the auxiliary newlib build.
 
 config LIBC_NEWLIB_AUX_BUILD_TARGET_CFLAGS
     string
     prompt "CFLAGS for the auxiliary build"
     depends on LIBC_NEWLIB_AUX_BUILD
     help
-      Configure options for the auxiliary build
+      Used to add specific options when compiling the target libraries of
+      auxiliary newlib, which can't be defined
+      in global TARGET_CFLAGS, because they shall be not used for the
+      gcc target libraries. See LIBC_NEWLIB_TARGET_CFLAGS also.

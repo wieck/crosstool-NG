@@ -151,7 +151,6 @@ do_libc_post_cc() {
 
 newlib_AUX_BUILD() {
     local aux_name
-    local -a aux_opts
     local aux_cflags
 
     aux_name="${CT_LIBC_NEWLIB_AUX_BUILD_NAME}"
@@ -162,9 +161,6 @@ newlib_AUX_BUILD() {
     cd "${CT_BUILD_DIR}/build-libc-${aux_name}"
 
     CT_DoLog EXTRA "Configuring auxiliary ${aux_name} C library"
-
-    # All configure options is squashed to one variable
-    for x in ${CT_LIBC_NEWLIB_AUX_BUILD_OPTS}; do aux_opts+=( "${x}" ); done
 
     # Also the same for TARGET_CFLAGS
     aux_cflags="${CT_TARGET_CFLAGS} ${CT_LIBC_NEWLIB_AUX_BUILD_TARGET_CFLAGS}"
@@ -179,7 +175,7 @@ newlib_AUX_BUILD() {
         --host=${CT_BUILD}                                         \
         --target=${CT_TARGET}                                      \
         --prefix=${CT_PREFIX_DIR}                                  \
-        "${aux_opts[@]}"
+        "${CT_LIBC_NEWLIB_AUX_BUILD_EXTRA_CONFIG_ARRAY[@]}"
 
     CT_DoLog EXTRA "Building auxiliary ${aux_name} C library"
     CT_DoExecLog ALL make ${JOBSFLAGS}
