@@ -1,7 +1,7 @@
 stages:
   - build
-  - test
   - manual_action
+  - test
 
 image: ${CI_DOCKER_REGISTRY}/esp32-ci-env
 
@@ -116,6 +116,10 @@ before_script:
       - dist
     when: always
     expire_in: 6 weeks
+  after_script:
+    # save artifacts in any case (both failure or success)
+    - git add -f dist build.log .config
+    - git clean -d -x -f -f
 
 .build_template_linux: &build_template_linux
   <<: *build_template
@@ -216,6 +220,10 @@ test_arm_rpi:
     PLATFORM_NAME: "linux-armel"
   before_script:
     - *use_ci_tools
+  after_script:
+    # 'after_script' has a new clean environment
+    - source citools/import_functions
+    - cit_rm xtensa-esp32-elf $IDF_PATH
   script:
     - pwd; id; uname -a
     - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
@@ -232,6 +240,37 @@ test_arm_rpi:
     - cd ${IDF_PATH}/examples/get-started/hello_world
     - make defconfig
     - make
+
+esp-tests:
+  stage: test
+  image: $CI_DOCKER_REGISTRY/compiler-testsuite:1
+  dependencies:
+    - build_linux_amd64
+  variables:
+    GIT_STRATEGY: none
+    PLATFORM_NAME: "linux-amd64"
+  artifacts:
+    when: always
+    paths:
+      - esp-compiler-tests/*/*.log
+      - esp-compiler-tests/*/*.elf
+  before_script:
+    - *use_ci_tools
+    - *add_gitlab_key
+  after_script:
+    - source citools/import_functions
+    - cit_rm xtensa-esp32-elf
+  script:
+    - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
+    - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
+    - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
+    - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
+    # Get and run tests
+    - ESP_COMPILER_TESTS_BRANCH="-b master"
+    - git clone --depth 1 $ESP_COMPILER_TESTS_BRANCH ${GITLAB_SSH_SERVER}/idf/esp-compiler-tests.git
+    - cd esp-compiler-tests
+    - source xtensa-esp32-profile
+    - ./run-all.sh
 
 upload_to_http:
   <<: *manual_action
