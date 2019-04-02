@@ -233,6 +233,34 @@ test_arm_rpi:
     - make defconfig
     - make
 
+esp-tests:
+  stage: test
+  image: $CI_DOCKER_REGISTRY/compiler-testsuite:1
+  dependencies:
+    - build_linux_amd64
+  variables:
+    GIT_STRATEGY: none
+    PLATFORM_NAME: "linux-amd64"
+  artifacts:
+    when: always
+    paths:
+      - esp-compiler-tests/*/*.log
+      - esp-compiler-tests/*/*.elf
+  before_script:
+    - *use_ci_tools
+    - *add_gitlab_key
+  script:
+    - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
+    - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
+    - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
+    - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
+    # Get and run tests
+    - ESP_COMPILER_TESTS_BRANCH="-b master"
+    - git clone --depth 1 $ESP_COMPILER_TESTS_BRANCH ${GITLAB_SSH_SERVER}/idf/esp-compiler-tests.git
+    - cd esp-compiler-tests
+    - source xtensa-esp32-profile
+    - ./run-all.sh
+
 upload_to_http:
   <<: *manual_action
   variables:
