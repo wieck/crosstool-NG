@@ -7,7 +7,7 @@ image: ${CI_DOCKER_REGISTRY}/esp32-ci-env
 
 variables:
   # GIT_STRATEGY - use option from "CI / CD Settings" - "General pipelines"
-  GIT_SUBMODULE_STRATEGY: none
+  GIT_SUBMODULE_STRATEGY: normal
 
   CONF_BUILD: "x86_64-linux-gnu"
   CONF_TARGET: "xtensa-esp32-elf"
@@ -23,15 +23,9 @@ variables:
 .add_gitlab_key: &add_gitlab_key |
   cit_add_ssh_key "${GITLAB_KEY}"
 
-.submodules_update: &submodules_update |
-  cit_git_clean_stale_submodules
-  git config submodule.overlays.url $GITLAB_SSH_SERVER/idf/xtensa-overlays.git
-  git submodule update --init
-
 before_script:
   - *use_ci_tools
   - *add_gitlab_key
-  - *submodules_update
 
 # Prepare release name/number
 .get_release_name: &get_release_name |
