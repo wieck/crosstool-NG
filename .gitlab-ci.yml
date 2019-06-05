@@ -202,8 +202,9 @@ build_linux_armel:
 
 test_arm_rpi:
   stage: test
+  image: $CI_DOCKER_REGISTRY/rpi-esp-idf-env:1
   tags:
-    - rpi-shell
+    - linux_arm
   dependencies:
     - build_linux_armel
   # It allows failure because the RPi runner is not stable
@@ -212,28 +213,29 @@ test_arm_rpi:
     GIT_STRATEGY: none
     IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
     PLATFORM_NAME: "linux-armel"
+    GITLAB_SSH_BRANCH: "-b master"
+    CONF_TARGET: "xtensa-esp32-elf"
   before_script:
     - *use_ci_tools
   after_script:
-    # 'after_script' has a new clean environment
-    - source citools/import_functions
-    - cit_rm xtensa-esp32-elf $IDF_PATH
+    - rm -rf ${CI_PROJECT_DIR}/*
   script:
     - pwd; id; uname -a
     - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
     - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
-    - file xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc
-    - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
-    # Add key for our gitlab
-    - cit_add_ssh_key "${GITLAB_KEY}" "$(cit_parse_url_host ${GITLAB_SSH_SERVER})" "$(cit_parse_url_port ${GITLAB_SSH_SERVER})"
+    - export PATH="${CI_PROJECT_DIR}/${CONF_TARGET}/bin:${PATH}"
+
+    - file ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc
+    - ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc -v
+
+    - cit_add_ssh_key "${GITLAB_KEY}"
     - rm -rf ${IDF_PATH}
-    - git clone --depth 1 ${GITLAB_SSH_BRANCH} ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
+    - git clone -q --depth 1 ${GITLAB_SSH_BRANCH} ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
     - cd ${IDF_PATH}
     - ./tools/ci/mirror-submodule-update.sh
-    - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
+    - source add_path.sh
     - cd ${IDF_PATH}/examples/get-started/hello_world
-    - make defconfig
-    - make
+    - idf.py build
 
 esp-tests:
   stage: test
