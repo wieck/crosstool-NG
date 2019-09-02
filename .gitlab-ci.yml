@@ -18,10 +18,18 @@ variables:
 before_script:
   - set -o errexit; set -o pipefail; set -o nounset
 
+# Add a key to clone from GITLAB_SSH_SERVER
+.add_gitlab_key: &add_gitlab_key |
+  command -v ssh-agent >/dev/null
+  eval $(ssh-agent -s)
+  printf '%s\n' "${GITLAB_KEY}" | tr -d '\r' | ssh-add - > /dev/null
+  mkdir -p ~/.ssh && chmod 700 ~/.ssh
+  [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config || true
+
 # Prepare release name/number
 .get_release_name: &get_release_name |
   VER_DESC=$(git describe | sed -E -n 's|.*crosstool-ng-([0-9]+).([0-9]+).([0-9]+)-([0-9]+)-g([0-9a-f]{7}).*|\1.\2.\3-\4-g\5|gp')
-  REL_NAME=xtensa-lx106-elf-${PLATFORM_NAME}-${VER_DESC}-4.8.5
+  REL_NAME=xtensa-lx106-elf-${PLATFORM_NAME}-${VER_DESC}-5.2.0
   ARCHIVE_NAME=${REL_NAME}.${ARCHIVE_EXT}
   echo "PLATFORM_NAME: $PLATFORM_NAME"
   echo "VER_DESC: $VER_DESC"
@@ -192,8 +200,9 @@ build_linux_armel:
 
 test_arm_rpi:
   stage: test
+  image: $CI_DOCKER_REGISTRY/rpi-esp-idf-env:1
   tags:
-    - rpi-shell
+    - linux_arm
   dependencies:
     - build_linux_armel
   # It allows failure because the RPi runner is not stable
@@ -202,17 +211,22 @@ test_arm_rpi:
     GIT_STRATEGY: none
     IDF_PATH: "${CI_PROJECT_DIR}/ESP8266_RTOS_SDK"
     PLATFORM_NAME: "linux-armel"
+    GITLAB_SSH_BRANCH: "-b master"
+  after_script:
+    - rm -rf ${CI_PROJECT_DIR}/*
   script:
     - pwd; id; uname -a
     - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
     - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
-    - file xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc
-    - ./xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc -v
+    - export PATH="${CI_PROJECT_DIR}/${CONF_TARGET}/bin:${PATH}"
+
+    - file ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc
+    - ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc -v
+
+    - *add_gitlab_key
     - rm -rf ${IDF_PATH}
-    - git clone --depth 1 https://github.com/espressif/ESP8266_RTOS_SDK ${IDF_PATH}
+    - git clone -q --depth 1 ${GITLAB_SSH_BRANCH} ${GITLAB_SSH_SERVER}/sdk/ESP8266_RTOS_SDK ${IDF_PATH}
     - cd ${IDF_PATH}
-    #- ./tools/ci/mirror-submodule-update.sh
-    - export PATH="${CI_PROJECT_DIR}/xtensa-lx106-elf/bin:${PATH}"
-    - cd ${IDF_PATH}/examples/protocols/http_request
+    - cd ${IDF_PATH}/examples/get-started/hello_world
     - make defconfig
     - make
