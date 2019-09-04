@@ -163,6 +163,8 @@ build_windows:
   variables:
     CONF_HOST: "i686-w64-mingw32"
     PLATFORM_NAME: "win32"
+    ARCHIVE_TOOL: "zip -r"
+    ARCHIVE_EXT: "zip"
   script:
     - *get_release_name
     - *build_ctng
