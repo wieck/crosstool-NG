@@ -103,6 +103,8 @@ before_script:
 # Common template for all builds
 .build_template: &build_template
   stage: build
+  tags:
+    - build
   artifacts:
     paths:
       - .config
@@ -128,8 +130,6 @@ before_script:
 
 .manual_action: &manual_action
   stage: manual_action
-  tags:
-    - deploy
   when: manual
   allow_failure: true
 
@@ -239,6 +239,8 @@ test_arm_rpi:
 
 esp-tests:
   stage: test
+  tags:
+    - build
   image: $CI_DOCKER_REGISTRY/compiler-testsuite:1
   dependencies:
     - build_linux_amd64
@@ -270,6 +272,9 @@ esp-tests:
 
 upload_to_http:
   <<: *manual_action
+  tags:
+    - deploy
+    - shiny
   variables:
     GIT_STRATEGY: none
   before_script:
