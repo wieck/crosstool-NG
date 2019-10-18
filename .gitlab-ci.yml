@@ -1,6 +1,6 @@
 stages:
   - build
-  - manual_action
+  - private_deploy
   - test
 
 image: ${CI_DOCKER_REGISTRY}/esp32-ci-env
@@ -9,11 +9,8 @@ variables:
   # GIT_STRATEGY - use option from "CI / CD Settings" - "General pipelines"
   GIT_SUBMODULE_STRATEGY: normal
 
-  CONF_BUILD: "x86_64-linux-gnu"
-  CONF_TARGET: "xtensa-esp32-elf"
-
   ARCHIVE_TOOL: "tar czvf" # 'v' we need to check the contents of the archive by log
-  UNARCHIVE_TOOL: "tar xvf"
+  UNARCHIVE_TOOL: "tar xf"
   ARCHIVE_EXT: "tar.gz"
 
 .use_ci_tools: &use_ci_tools |
@@ -32,7 +29,7 @@ before_script:
   # using annotated tags
   REL_NUM=$(git describe --abbrev=7)
   REL_SFX="gcc8_2_0"
-  REL_NAME=xtensa-esp32-elf-${REL_SFX}-${REL_NUM}-${PLATFORM_NAME}
+  REL_NAME=${CONF_TARGET}-${REL_SFX}-${REL_NUM}-${PLATFORM_NAME}
   ARCHIVE_NAME=${REL_NAME}.${ARCHIVE_EXT}
   echo "PLATFORM_NAME: $PLATFORM_NAME"
   echo "REL_NUM: $REL_NUM"
@@ -97,12 +94,14 @@ before_script:
   rm -f ${CONF_TARGET}/build.log.bz2
   ${ARCHIVE_TOOL} ${ARCHIVE_NAME} ${CONF_TARGET}/
   mv ${ARCHIVE_NAME} ../dist/
-  echo "${ARCHIVE_NAME}" > ../dist/archive_name_${PLATFORM_NAME}
+  echo "${ARCHIVE_NAME}" > ../dist/file_${PLATFORM_NAME}_${CONF_TARGET}
   popd
 
 # Common template for all builds
 .build_template: &build_template
   stage: build
+  tags:
+    - build
   artifacts:
     paths:
       - .config
@@ -127,31 +126,40 @@ before_script:
     - *package_toolchain
 
 .manual_action: &manual_action
-  stage: manual_action
-  tags:
-    - deploy
   when: manual
   allow_failure: true
 
-build_linux_amd64:
+esp32_lin_amd64:
   <<: *build_template_linux
   image: $CI_DOCKER_REGISTRY/esp32-toolchain
   variables:
     PLATFORM_NAME: "linux-amd64"
+    CONF_TARGET: "xtensa-esp32-elf"
 
-build_linux_i686:
+esp32s2_lin_amd64:
+  <<: *build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain
+  variables:
+    PLATFORM_NAME: "linux-amd64"
+    CONF_TARGET: "xtensa-esp32s2-elf"
+
+esp32_lin_i686:
   <<: *build_template_linux
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-x86
   variables:
     PLATFORM_NAME: "linux-i686"
+    CONF_TARGET: "xtensa-esp32-elf"
 
-build_macos:
-  <<: *build_template
-  image: ci.espressif.cn:42348/esp32-toolchain-macos-cross
+esp32s2_lin_i686:
+  <<: *build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-x86
   variables:
-    CONF_HOST: "x86_64-apple-darwin12"
-    PLATFORM_NAME: "macos"
-    MACOSX_DEPLOYMENT_TARGET: "10.8"
+    PLATFORM_NAME: "linux-i686"
+    CONF_TARGET: "xtensa-esp32s2-elf"
+
+.template_macos_cross: &template_macos_cross
+  <<: *build_template
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-macos-cross
   script:
     - *get_release_name
     - *build_ctng
@@ -161,14 +169,27 @@ build_macos:
     - *build_toolchain
     - *package_toolchain
 
-build_windows:
+esp32_macos:
+  <<: *template_macos_cross
+  variables:
+    PLATFORM_NAME: "macos"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "x86_64-apple-darwin12"
+    CONF_TARGET: "xtensa-esp32-elf"
+    MACOSX_DEPLOYMENT_TARGET: "10.8"
+
+esp32s2_macos:
+  <<: *template_macos_cross
+  variables:
+    PLATFORM_NAME: "macos"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "x86_64-apple-darwin12"
+    CONF_TARGET: "xtensa-esp32s2-elf"
+    MACOSX_DEPLOYMENT_TARGET: "10.8"
+
+.template_win_cross: &template_win_cross
   <<: *build_template
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-win-cross
-  variables:
-    CONF_HOST: "i686-w64-mingw32"
-    PLATFORM_NAME: "win32"
-    ARCHIVE_TOOL: "zip -r"
-    ARCHIVE_EXT: "zip"
   script:
     - *get_release_name
     - *build_ctng
@@ -178,12 +199,29 @@ build_windows:
     - *build_toolchain
     - *package_toolchain
 
-build_linux_armel:
+esp32_win:
+  <<: *template_win_cross
+  variables:
+    PLATFORM_NAME: "win32"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "i686-w64-mingw32"
+    CONF_TARGET: "xtensa-esp32-elf"
+    ARCHIVE_TOOL: "zip -r"
+    ARCHIVE_EXT: "zip"
+
+esp32s2_win:
+  <<: *template_win_cross
+  variables:
+    PLATFORM_NAME: "win32"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "i686-w64-mingw32"
+    CONF_TARGET: "xtensa-esp32s2-elf"
+    ARCHIVE_TOOL: "zip -r"
+    ARCHIVE_EXT: "zip"
+
+.template_lin_armel_cross: &template_lin_armel_cross
   <<: *build_template
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-arm-cross
-  variables:
-    CONF_HOST: "arm-linux-gnueabi"
-    PLATFORM_NAME: "linux-armel"
   script:
     - *get_release_name
     - *build_ctng
@@ -200,28 +238,37 @@ build_linux_armel:
     - *build_toolchain
     - *package_toolchain
 
-test_arm_rpi:
+esp32_lin_armel:
+  <<: *template_lin_armel_cross
+  variables:
+    PLATFORM_NAME: "linux-armel"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "arm-linux-gnueabi"
+    CONF_TARGET: "xtensa-esp32-elf"
+
+esp32s2_lin_armel:
+  <<: *template_lin_armel_cross
+  variables:
+    PLATFORM_NAME: "linux-armel"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "arm-linux-gnueabi"
+    CONF_TARGET: "xtensa-esp32s2-elf"
+
+.test_arm_rpi: &test_arm_rpi
   stage: test
   image: $CI_DOCKER_REGISTRY/rpi-esp-idf-env:1
   tags:
     - linux_arm
-  dependencies:
-    - build_linux_armel
   # It allows failure because the RPi runner is not stable
   allow_failure: true
   variables:
-    GIT_STRATEGY: none
-    IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
-    PLATFORM_NAME: "linux-armel"
-    GITLAB_SSH_BRANCH: "-b master"
-    CONF_TARGET: "xtensa-esp32-elf"
   before_script:
     - *use_ci_tools
   after_script:
     - rm -rf ${CI_PROJECT_DIR}/*
   script:
     - pwd; id; uname -a
-    - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
+    - ARCHIVE_NAME=$(cat dist/file_${PLATFORM_NAME}_${CONF_TARGET})
     - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
     - export PATH="${CI_PROJECT_DIR}/${CONF_TARGET}/bin:${PATH}"
 
@@ -232,19 +279,39 @@ test_arm_rpi:
     - rm -rf ${IDF_PATH}
     - git clone -q --depth 1 ${GITLAB_SSH_BRANCH} ${GITLAB_SSH_SERVER}/idf/esp-idf ${IDF_PATH}
     - cd ${IDF_PATH}
-    - ./tools/ci/mirror-submodule-update.sh
+    - git submodule update --init
     - source add_path.sh
     - cd ${IDF_PATH}/examples/get-started/hello_world
     - idf.py build
 
-esp-tests:
-  stage: test
-  image: $CI_DOCKER_REGISTRY/compiler-testsuite:1
+esp32-rpi-test:
+  <<: *test_arm_rpi
   dependencies:
-    - build_linux_amd64
+    - esp32_lin_armel
   variables:
     GIT_STRATEGY: none
-    PLATFORM_NAME: "linux-amd64"
+    PLATFORM_NAME: "linux-armel"
+    CONF_TARGET: "xtensa-esp32-elf"
+    IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
+    GITLAB_SSH_BRANCH: "-b master"
+
+esp32s2-rpi-test:
+  <<: *test_arm_rpi
+  dependencies:
+    - esp32s2_lin_armel
+  variables:
+    GIT_STRATEGY: none
+    PLATFORM_NAME: "linux-armel"
+    CONF_TARGET: "xtensa-esp32s2-elf"
+    IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
+    GITLAB_SSH_BRANCH: "-b feature/esp32s2beta"
+    IDF_TARGET: "esp32s2beta"
+
+.template_compiler_tests: &template_compiler_tests
+  stage: test
+  tags:
+    - build
+  image: $CI_DOCKER_REGISTRY/compiler-testsuite:1
   artifacts:
     when: always
     paths:
@@ -255,21 +322,43 @@ esp-tests:
     - *add_gitlab_key
   after_script:
     - source citools/import_functions
-    - cit_rm xtensa-esp32-elf
+    - cit_rm ${CONF_TARGET}
   script:
-    - ARCHIVE_NAME=$(cat dist/archive_name_${PLATFORM_NAME})
+    - ARCHIVE_NAME=$(cat dist/file_${PLATFORM_NAME}_${CONF_TARGET})
     - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
-    - ./xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc -v
-    - export PATH="${CI_PROJECT_DIR}/xtensa-esp32-elf/bin:${PATH}"
+    - ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc -v
+    - export PATH="${CI_PROJECT_DIR}/${CONF_TARGET}/bin:${PATH}"
     # Get and run tests
     - ESP_COMPILER_TESTS_BRANCH="-b master"
-    - git clone --depth 1 $ESP_COMPILER_TESTS_BRANCH ${GITLAB_SSH_SERVER}/idf/esp-compiler-tests.git
+    - git clone -q --depth 1 $ESP_COMPILER_TESTS_BRANCH ${GITLAB_SSH_SERVER}/idf/esp-compiler-tests.git
     - cd esp-compiler-tests
-    - source xtensa-esp32-profile
+    - source ${CONF_TARGET}-profile
     - ./run-all.sh
+
+esp32-compiler-tests:
+  <<: *template_compiler_tests
+  dependencies:
+    - esp32_lin_amd64
+  variables:
+    GIT_STRATEGY: none
+    PLATFORM_NAME: "linux-amd64"
+    CONF_TARGET: "xtensa-esp32-elf"
+
+esp32s2-compiler-tests:
+  <<: *template_compiler_tests
+  dependencies:
+    - esp32s2_lin_amd64
+  variables:
+    GIT_STRATEGY: none
+    PLATFORM_NAME: "linux-amd64"
+    CONF_TARGET: "xtensa-esp32s2-elf"
 
 upload_to_http:
   <<: *manual_action
+  stage: private_deploy
+  tags:
+    - deploy
+    - shiny
   variables:
     GIT_STRATEGY: none
   before_script:
@@ -277,7 +366,7 @@ upload_to_http:
   script:
     - cit_add_ssh_key "${HTTP_UPLOAD_KEY}" "$(cit_parse_url_host ${HTTP_UPLOAD_DIR})"
     # List of archives in dist/
-    - FILES=$(find dist -name archive_name_\* -exec cat {} \+)
+    - FILES=$(find dist -name file_\* -exec cat {} \+)
     - cd dist
     - scp ${FILES} ${HTTP_UPLOAD_DIR}
     # Show info
