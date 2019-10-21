@@ -7,7 +7,7 @@ AC_PREREQ([2.67])
 # FIXME need to quote sed expression
 AC_INIT(
     [crosstool-NG],
-    [m4_esyscmd_s([git describe --always --dirty | sed s,^crosstool-ng-,,])],
+    [m4_esyscmd_s([git describe --always --dirty --abbrev=7 | sed s,^crosstool-ng-,,])],
     [crossgcc@sourceware.org],
     [crosstool-ng],
     [http://crosstool-ng.org])
