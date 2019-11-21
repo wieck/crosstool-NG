@@ -286,8 +286,6 @@ esp32s2_lin_armel:
 
 esp32-rpi-test:
   <<: *test_arm_rpi
-  tags:
-    - build
   dependencies:
     - esp32_lin_armel
   variables:
