@@ -100,8 +100,7 @@ before_script:
 # Common template for all builds
 .build_template: &build_template
   stage: build
-  tags:
-    - build
+  tags: [ "build", "amd64" ]
   artifacts:
     paths:
       - .config
@@ -124,10 +123,6 @@ before_script:
     - *configure_linux_no_pie
     - *build_toolchain
     - *package_toolchain
-
-.manual_action: &manual_action
-  when: manual
-  allow_failure: true
 
 esp32_lin_amd64:
   <<: *build_template_linux
@@ -257,10 +252,7 @@ esp32s2_lin_armel:
 .test_arm_rpi: &test_arm_rpi
   stage: test
   image: $CI_DOCKER_REGISTRY/rpi-esp-idf-env:1
-  tags:
-    - linux_arm
-  # It allows failure because the RPi runner is not stable
-  allow_failure: true
+  tags: [ "build", "arm" ]
   variables:
   before_script:
     - *use_ci_tools
@@ -309,8 +301,7 @@ esp32s2-rpi-test:
 
 .template_compiler_tests: &template_compiler_tests
   stage: test
-  tags:
-    - build
+  tags: [ "build", "amd64" ]
   image: $CI_DOCKER_REGISTRY/compiler-testsuite:1
   artifacts:
     when: always
@@ -355,11 +346,10 @@ esp32s2-compiler-tests:
     CONF_TARGET: "xtensa-esp32s2-elf"
 
 upload_to_http:
-  <<: *manual_action
   stage: private_deploy
-  tags:
-    - deploy
-    - shiny
+  when: manual
+  allow_failure: true
+  tags: [ "deploy", "shiny" ]
   variables:
     GIT_STRATEGY: none
   before_script:
