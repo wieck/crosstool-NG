@@ -145,6 +145,13 @@ esp32s3_lin_amd64:
     PLATFORM_NAME: "linux-amd64"
     CONF_TARGET: "xtensa-esp32s3-elf"
 
+esp8266_lin_amd64:
+  extends: .build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain
+  variables:
+    PLATFORM_NAME: "linux-amd64"
+    CONF_TARGET: "xtensa-lx106-elf"
+
 esp32_lin_i686:
   extends: .build_template_linux
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-x86
@@ -165,6 +172,13 @@ esp32s3_lin_i686:
   variables:
     PLATFORM_NAME: "linux-i686"
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+esp8266_lin_i686:
+  extends: .build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-x86
+  variables:
+    PLATFORM_NAME: "linux-i686"
+    CONF_TARGET: "xtensa-lx106-elf"
 
 .template_macos_cross:
   extends: .build_template
@@ -197,6 +211,11 @@ esp32s3_macos:
   extends: .template_macos_cross
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+esp8266_macos:
+  extends: .template_macos_cross
+  variables:
+    CONF_TARGET: "xtensa-lx106-elf"
 
 .template_win_cross:
   extends: .build_template
@@ -231,6 +250,11 @@ esp32s3_win:
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
 
+esp8266_win:
+  extends: .template_win_cross
+  variables:
+    CONF_TARGET: "xtensa-lx106-elf"
+
 .template_win64_cross:
   extends: .build_template
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-win64-cross
@@ -263,6 +287,11 @@ esp32s3_win64:
   extends: .template_win64_cross
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+esp8266_win64:
+  extends: .template_win64_cross
+  variables:
+    CONF_TARGET: "xtensa-lx106-elf"
 
 .template_lin_armel_cross:
   extends: .build_template
@@ -301,6 +330,11 @@ esp32s3_lin_armel:
   extends: .template_lin_armel_cross
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+esp8266_lin_armel:
+  extends: .template_lin_armel_cross
+  variables:
+    CONF_TARGET: "xtensa-lx106-elf"
 
 .test_arm_rpi:
   stage: test
@@ -345,6 +379,38 @@ esp32s3_lin_armel:
   variables:
     CONF_TARGET: "xtensa-esp32s2-elf"
     IDF_TARGET: "esp32s2beta"
+
+esp8266-rpi-test:
+  stage: test
+  image: $CI_DOCKER_REGISTRY/rpi-esp-idf-env:1
+  tags: [ "arm" ]
+  dependencies:
+    - esp8266_lin_armel
+  variables:
+    PLATFORM_NAME: "linux-armel"
+    GIT_STRATEGY: none
+    CONF_TARGET: "xtensa-lx106-elf"
+    IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
+    ESP_IDF_BRANCH: "-b feature/support_gcc_v8.x"
+  after_script:
+    - rm -rf ${CI_PROJECT_DIR}/*
+  script:
+    - pwd; id; uname -a
+    - ARCHIVE_NAME=$(cat dist/file_${PLATFORM_NAME}_${CONF_TARGET})
+    - ${UNARCHIVE_TOOL} dist/${ARCHIVE_NAME}
+    - export PATH="${CI_PROJECT_DIR}/${CONF_TARGET}/bin:${PATH}"
+
+    - file ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc
+    - ./${CONF_TARGET}/bin/${CONF_TARGET}-gcc -v
+
+    - rm -rf ${IDF_PATH}
+    - git clone -q --depth 1 ${ESP_IDF_BRANCH} ${GITLAB_SSH_SERVER}/sdk/ESP8266_RTOS_SDK ${IDF_PATH}
+    - cd ${IDF_PATH}
+    - git submodule update --init
+    - source add_path.sh
+    - cd ${IDF_PATH}/examples/get-started/hello_world
+    - idf.py build
+    
 
 .template_compiler_tests:
   stage: test
@@ -393,6 +459,13 @@ esp32s3-compiler-tests:
     - esp32s3_lin_amd64
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+esp8266-compiler-tests:
+  extends: .template_compiler_tests
+  dependencies:
+    - esp8266_lin_amd64
+  variables:
+    CONF_TARGET: "xtensa-lx106-elf"
 
 upload_to_http:
   stage: private_deploy
