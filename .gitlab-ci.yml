@@ -297,9 +297,6 @@ esp32s2-rpi-test:
     GIT_STRATEGY: none
     PLATFORM_NAME: "linux-amd64"
     ESP_COMPILER_TESTS_BRANCH: "-b master"
-  before_script:
-    - *use_ci_tools
-    - *add_gitlab_key
   after_script:
     - source citools/import_functions
     - cit_rm ${CONF_TARGET}
@@ -336,13 +333,21 @@ upload_to_http:
   variables:
     # force the fetch strategy to clean a working dir
     GIT_STRATEGY: fetch
+    CTNG_ESP_HELPERS_BRANCH: "-b master"
   before_script:
     - *use_ci_tools
   script:
     - cit_add_ssh_key "${HTTP_UPLOAD_KEY}"
     # List of archives in dist/
     - FILES=$(find dist -name file_\* -exec cat {} \+)
-    - cd dist
+    - pushd dist
     - scp ${FILES} ${HTTP_UPLOAD_DIR}
-    # Show info
+    # Show download links
     - echo -e "\nArchives were published there:\n\n$(for n in ${FILES}; do echo "${HTTP_PUBLIC_DIR}/${n}"; done)\n"
+    - popd
+    # Show checksums
+    - cit_add_ssh_key "${GITLAB_KEY}"
+    - git clone -q --depth 1 ${CTNG_ESP_HELPERS_BRANCH} ${GITLAB_SSH_SERVER}/idf/ctng-esp-helpers.git
+    - pushd dist
+    - ../ctng-esp-helpers/print_all_checksum_json.sh "${HTTP_PUBLIC_DIR}" "xtensa-esp32-elf xtensa-esp32s2-elf" "linux-amd64 linux-armel linux-i686 macos win32"
+    - popd
