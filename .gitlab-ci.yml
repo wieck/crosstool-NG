@@ -248,7 +248,7 @@ esp32s2_lin_armel:
     GIT_STRATEGY: none
     PLATFORM_NAME: "linux-armel"
     IDF_PATH: "${CI_PROJECT_DIR}/esp-idf"
-    ESP_IDF_BRANCH: "-b release/v4.1"
+    ESP_IDF_BRANCH: "-b release/v4.2"
   after_script:
     - rm -rf ${CI_PROJECT_DIR}/*
   script:
@@ -296,7 +296,7 @@ esp32s2-rpi-test:
   variables:
     GIT_STRATEGY: none
     PLATFORM_NAME: "linux-amd64"
-    ESP_COMPILER_TESTS_BRANCH: "-b esp-2019r2"
+    ESP_COMPILER_TESTS_BRANCH: "-b esp-2020r2"
   after_script:
     - source citools/import_functions
     - cit_rm ${CONF_TARGET}
