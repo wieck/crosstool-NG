@@ -296,7 +296,7 @@ esp32s2-rpi-test:
   variables:
     GIT_STRATEGY: none
     PLATFORM_NAME: "linux-amd64"
-    ESP_COMPILER_TESTS_BRANCH: "-b esp-2020r2"
+    ESP_COMPILER_TESTS_BRANCH: "-b esp-2020r1"
   after_script:
     - source citools/import_functions
     - cit_rm ${CONF_TARGET}
