@@ -207,6 +207,34 @@ esp32s2_win:
   variables:
     CONF_TARGET: "xtensa-esp32s2-elf"
 
+.template_win64_cross:
+  extends: .build_template
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain-win64-cross
+  variables:
+    PLATFORM_NAME: "win64"
+    CONF_BUILD: "x86_64-linux-gnu"
+    CONF_HOST: "x86_64-w64-mingw32"
+    ARCHIVE_TOOL: "zip -r"
+    ARCHIVE_EXT: "zip"
+  script:
+    - *get_release_name
+    - *build_ctng
+    - *configure_common
+    - *configure_docker
+    - *configure_crossbuild
+    - *build_toolchain
+    - *package_toolchain
+
+esp32_win64:
+  extends: .template_win64_cross
+  variables:
+    CONF_TARGET: "xtensa-esp32-elf"
+
+esp32s2_win64:
+  extends: .template_win64_cross
+  variables:
+    CONF_TARGET: "xtensa-esp32s2-elf"
+
 .template_lin_armel_cross:
   extends: .build_template
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-arm-cross
@@ -349,5 +377,5 @@ upload_to_http:
     - cit_add_ssh_key "${GITLAB_KEY}"
     - git clone -q --depth 1 ${CTNG_ESP_HELPERS_BRANCH} ${GITLAB_SSH_SERVER}/idf/ctng-esp-helpers.git
     - pushd dist
-    - ../ctng-esp-helpers/print_all_checksum_json.sh "${HTTP_PUBLIC_DIR}" "xtensa-esp32-elf xtensa-esp32s2-elf" "linux-amd64 linux-armel linux-i686 macos win32"
+    - ../ctng-esp-helpers/print_all_checksum_json.sh "${HTTP_PUBLIC_DIR}" "xtensa-esp32-elf xtensa-esp32s2-elf" "linux-amd64 linux-armel linux-i686 macos win32 win64"
     - popd
