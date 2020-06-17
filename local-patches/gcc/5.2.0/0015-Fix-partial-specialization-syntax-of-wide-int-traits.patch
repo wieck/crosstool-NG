@@ -1,7 +1,7 @@
-From a31d393b2c56098d74fd3c968f17ce30072f3453 Mon Sep 17 00:00:00 2001
+From 538fc7bca291fdcc9899df90a98fbc190f4a2f54 Mon Sep 17 00:00:00 2001
 From: miyuki <miyuki@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Mon, 20 Jul 2015 05:30:12 +0000
-Subject: [PATCH 1/2] Fix partial specialization syntax of wide int traits.
+Subject: [PATCH 15/18] Fix partial specialization syntax of wide int traits.
 
 gcc/
 	* wide-int.h (struct binary_traits): Fix partial specialization syntax.
@@ -108,5 +108,5 @@ index 46f45453c01..9a71c4fea61 100644
    struct int_traits < fixed_wide_int_storage <N> >
    {
 -- 
-2.14.3
+2.21.0 (Apple Git-122)
 

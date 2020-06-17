@@ -1,16 +1,16 @@
-From 2164b6d6d01b004f7ef14c650f454c94e939ee0f Mon Sep 17 00:00:00 2001
+From 852828b87c0549dd7df4b88975f1d62ffc6026b4 Mon Sep 17 00:00:00 2001
 From: Jeroen Domburg <jeroen@espressif.com>
 Date: Sat, 12 Aug 2017 23:10:12 +0800
-Subject: [PATCH 07/13] xtensa: add workaround for pSRAM cache issue in ESP32
+Subject: [PATCH 07/18] xtensa: add workaround for pSRAM cache issue in ESP32
 
 ---
- gcc/config/xtensa/xtensa.c   | 195 ++++++++++++++++++++++++++++++++++++++++++-
- gcc/config/xtensa/xtensa.md  |  30 ++++++-
+ gcc/config/xtensa/xtensa.c   | 195 ++++++++++++++++++++++++++++++++++-
+ gcc/config/xtensa/xtensa.md  |  30 +++++-
  gcc/config/xtensa/xtensa.opt |   8 ++
  3 files changed, 229 insertions(+), 4 deletions(-)
 
 diff --git a/gcc/config/xtensa/xtensa.c b/gcc/config/xtensa/xtensa.c
-index 6a73082a7fa..a4b0bb1efe4 100644
+index 57b005293bd..8df209c14e3 100644
 --- a/gcc/config/xtensa/xtensa.c
 +++ b/gcc/config/xtensa/xtensa.c
 @@ -91,7 +91,8 @@ along with GCC; see the file COPYING3.  If not see
@@ -23,7 +23,7 @@ index 6a73082a7fa..a4b0bb1efe4 100644
  
  /* Enumeration for all of the relational tests, so that we can build
     arrays indexed by the test type, and not worry about the order
-@@ -2209,6 +2210,185 @@ xtensa_return_in_msb (const_tree valtype)
+@@ -2208,6 +2209,185 @@ xtensa_return_in_msb (const_tree valtype)
  }
  
  
@@ -209,7 +209,7 @@ index 6a73082a7fa..a4b0bb1efe4 100644
  static void
  xtensa_option_override (void)
  {
-@@ -2267,6 +2447,19 @@ xtensa_option_override (void)
+@@ -2266,6 +2446,19 @@ xtensa_option_override (void)
    if (flag_pic && !flag_pie)
      flag_shlib = 1;
  
@@ -292,5 +292,5 @@ index 21c6e962abb..c31f8f9374b 100644
 +Target Report Mask(ESP32_ALWAYS_MEMMARRIER)
 +Always emit a MEMW before a load or store operation. Used to debug memory coherency issues.
 -- 
-2.13.5 (Apple Git-94)
+2.21.0 (Apple Git-122)
 

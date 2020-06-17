@@ -1,7 +1,7 @@
-From 822a43ca2d3f81f621cc8a4f0ebb14b2972e6e4c Mon Sep 17 00:00:00 2001
+From 9351610c4cb1f34a9b125ae610149243243f2299 Mon Sep 17 00:00:00 2001
 From: Ivan Grokhotkov <ivan@espressif.com>
 Date: Wed, 3 Jan 2018 06:16:18 +0800
-Subject: [PATCH 14/14] gcc/config/xtensa: build multilib for esp32 psram
+Subject: [PATCH 14/18] gcc/config/xtensa: build multilib for esp32 psram
  workaround
 
 ---
@@ -20,5 +20,5 @@ index 0c2ea8a4125..dc256475321 100644
 +MULTILIB_OPTIONS = mfix-esp32-psram-cache-issue
 +MULTILIB_DIRNAMES = esp32-psram
 -- 
-2.13.5 (Apple Git-94)
+2.21.0 (Apple Git-122)
 

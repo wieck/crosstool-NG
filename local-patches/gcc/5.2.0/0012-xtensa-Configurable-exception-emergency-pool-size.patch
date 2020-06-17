@@ -1,7 +1,7 @@
-From 78a0fc18b84420da867f9b388420ba8b447848ff Mon Sep 17 00:00:00 2001
+From a39da3dc47b6e88daa20f5ef435a0fb3979c18f8 Mon Sep 17 00:00:00 2001
 From: Alexey Gerenkov <alexey@espressif.com>
 Date: Thu, 16 Nov 2017 15:06:35 +0300
-Subject: [PATCH 12/13] xtensa: Configurable exception emergency pool size
+Subject: [PATCH 12/18] xtensa: Configurable exception emergency pool size
 
 ---
  libstdc++-v3/libsupc++/eh_alloc.cc | 15 ++++++++++++---
@@ -41,5 +41,5 @@ index 7ddd2b746d8..aca2e37799a 100644
  	{
  	  // If the allocation failed go without an emergency pool.
 -- 
-2.13.5 (Apple Git-94)
+2.21.0 (Apple Git-122)
 

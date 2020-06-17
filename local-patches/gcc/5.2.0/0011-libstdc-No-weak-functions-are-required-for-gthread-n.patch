@@ -1,7 +1,7 @@
-From 7ddbb9093e4f334cddd2ea9c230012b242c06bef Mon Sep 17 00:00:00 2001
+From 9849fd4f0e47fd95fd6edc40be6e339481ea6278 Mon Sep 17 00:00:00 2001
 From: Amey Inamdar <amey@espressif.com>
 Date: Tue, 7 Nov 2017 09:12:11 +0530
-Subject: [PATCH 11/13] libstdc++: No weak functions are required for gthread
+Subject: [PATCH 11/18] libstdc++: No weak functions are required for gthread
  now. Also enabling cond_var constructor invocation.
 
 Signed-off-by: Amey Inamdar <amey@espressif.com>
@@ -32,5 +32,5 @@ index 6aef4a7a3cc..6b3db135271 100644
  
  #endif
 -- 
-2.13.5 (Apple Git-94)
+2.21.0 (Apple Git-122)
 

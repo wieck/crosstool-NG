@@ -1,7 +1,7 @@
-From c6b28173f838cf25112dbd21ff46cd229e73e637 Mon Sep 17 00:00:00 2001
+From 8c9608641340fd05fbd497f9794831c81df590b9 Mon Sep 17 00:00:00 2001
 From: iains <iains@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Mon, 25 Sep 2017 23:49:58 +0000
-Subject: [PATCH 10/13] Fix 81037 by adjutng headers
+Subject: [PATCH 10/18] Fix 81037 by adjutng headers
 
 2017-09-26  Iain Sandoe  <iain@codesourcery.com>
             Ryan Mounce  <ryan@mounce.com.au>
@@ -292,5 +292,5 @@ index cb6c51739ff..5b49197cd38 100644
  static void do_compile ();
  static void process_options (void);
 -- 
-2.13.5 (Apple Git-94)
+2.21.0 (Apple Git-122)
 

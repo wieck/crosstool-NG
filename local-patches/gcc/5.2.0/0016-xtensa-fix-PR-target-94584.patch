@@ -1,0 +1,91 @@
+From 23065997d5e4b6770393996c506758d600d8e231 Mon Sep 17 00:00:00 2001
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon, 13 Apr 2020 13:26:04 -0700
+Subject: [PATCH 16/18] xtensa: fix PR target/94584
+
+Patterns zero_extendhisi2, zero_extendqisi2 and extendhisi2_internal can
+load value from memory, but they don't treat volatile memory correctly.
+Add %v1 before load instructions to emit 'memw' instruction when
+-mserialize-volatile is in effect.
+
+2020-04-14  Max Filippov  <jcmvbkbc@gmail.com>
+gcc/
+	* config/xtensa/xtensa.md (zero_extendhisi2, zero_extendqisi2)
+	(extendhisi2_internal): Add %v1 before the load instructions.
+
+gcc/testsuite/
+	* gcc.target/xtensa/pr94584.c: New test.
+
+# Conflicts:
+#	gcc/ChangeLog
+#	gcc/testsuite/ChangeLog
+---
+ gcc/config/xtensa/xtensa.md               |  6 +++---
+ gcc/testsuite/gcc.target/xtensa/pr94584.c | 24 +++++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 3 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.target/xtensa/pr94584.c
+
+diff --git a/gcc/config/xtensa/xtensa.md b/gcc/config/xtensa/xtensa.md
+index 550b13442fd..81c8e2f4587 100644
+--- a/gcc/config/xtensa/xtensa.md
++++ b/gcc/config/xtensa/xtensa.md
+@@ -565,7 +565,7 @@
+   ""
+   "@
+    extui\t%0, %1, 0, 16
+-   l16ui\t%0, %1"
++   %v1l16ui\t%0, %1"
+   [(set_attr "type"	"arith,load")
+    (set_attr "mode"	"SI")
+    (set_attr "length"	"3,3")])
+@@ -576,7 +576,7 @@
+   ""
+   "@
+    extui\t%0, %1, 0, 8
+-   l8ui\t%0, %1"
++   %v1l8ui\t%0, %1"
+   [(set_attr "type"	"arith,load")
+    (set_attr "mode"	"SI")
+    (set_attr "length"	"3,3")])
+@@ -602,7 +602,7 @@
+   ""
+   "@
+    sext\t%0, %1, 15
+-   l16si\t%0, %1"
++   %v1l16si\t%0, %1"
+   [(set_attr "type"	"arith,load")
+    (set_attr "mode"	"SI")
+    (set_attr "length"	"3,3")])
+diff --git a/gcc/testsuite/gcc.target/xtensa/pr94584.c b/gcc/testsuite/gcc.target/xtensa/pr94584.c
+new file mode 100644
+index 00000000000..1577285b8a6
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/xtensa/pr94584.c
+@@ -0,0 +1,24 @@
++/* { dg-do compile } */
++/* { dg-options "-O2 -mserialize-volatile" } */
++
++unsigned long load32 (volatile unsigned long *s)
++{
++  return *s;
++}
++
++short load16s (volatile short *s)
++{
++  return *s;
++}
++
++unsigned short load16u (volatile unsigned short *s)
++{
++  return *s;
++}
++
++unsigned char load8 (volatile unsigned char *s)
++{
++  return *s;
++}
++
++/* { dg-final { scan-assembler-times "memw" 4 } } */
+-- 
+2.21.0 (Apple Git-122)
+
