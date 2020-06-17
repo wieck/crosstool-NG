@@ -96,6 +96,7 @@ before_script:
   ${ARCHIVE_TOOL} ${ARCHIVE_NAME} ${CONF_TARGET}/
   mv ${ARCHIVE_NAME} ../dist/
   echo "${ARCHIVE_NAME}" > ../dist/file_${PLATFORM_NAME}_${CONF_TARGET}
+  ls -l ../dist/
   popd
 
 # Common template for all builds
@@ -146,6 +147,13 @@ esp32s3_lin_amd64:
   variables:
     PLATFORM_NAME: "linux-amd64"
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+riscv32_esp_lin_amd64:
+  extends: .build_template_linux
+  image: $CI_DOCKER_REGISTRY/esp32-toolchain
+  variables:
+    PLATFORM_NAME: "linux-amd64"
+    CONF_TARGET: "riscv32-esp-elf"
 
 esp32_lin_i686:
   extends: .build_template_linux
@@ -200,6 +208,11 @@ esp32s3_macos:
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
 
+riscv32_esp_macos:
+  extends: .template_macos_cross
+  variables:
+    CONF_TARGET: "riscv32-esp-elf"
+
 .template_win_cross:
   extends: .build_template
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-win-cross
@@ -233,6 +246,11 @@ esp32s3_win:
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
 
+riscv32_esp_win:
+  extends: .template_win_cross
+  variables:
+    CONF_TARGET: "riscv32-esp-elf"
+
 .template_win64_cross:
   extends: .build_template
   image: $CI_DOCKER_REGISTRY/esp32-toolchain-win64-cross
@@ -265,6 +283,11 @@ esp32s3_win64:
   extends: .template_win64_cross
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+riscv32_esp_win64:
+  extends: .template_win64_cross
+  variables:
+    CONF_TARGET: "riscv32-esp-elf"
 
 .template_lin_armel_cross:
   extends: .build_template
@@ -303,6 +326,11 @@ esp32s3_lin_armel:
   extends: .template_lin_armel_cross
   variables:
     CONF_TARGET: "xtensa-esp32s3-elf"
+
+riscv32_esp_lin_armel:
+  extends: .template_lin_armel_cross
+  variables:
+    CONF_TARGET: "riscv32-esp-elf"
 
 .test_arm_rpi:
   stage: test
@@ -420,5 +448,5 @@ upload_to_http:
     - cit_add_ssh_key "${GITLAB_KEY}"
     - git clone -q --depth 1 ${CTNG_ESP_HELPERS_BRANCH} ${GITLAB_SSH_SERVER}/idf/ctng-esp-helpers.git
     - pushd dist
-    - ../ctng-esp-helpers/print_all_checksum_json.sh "${HTTP_PUBLIC_DIR}" "xtensa-esp32-elf xtensa-esp32s2-elf xtensa-esp32s3-elf" "linux-amd64 linux-armel linux-i686 macos win32 win64"
+    - ../ctng-esp-helpers/print_all_checksum_json.sh "${HTTP_PUBLIC_DIR}" "xtensa-esp32-elf xtensa-esp32s2-elf xtensa-esp32s3-elf riscv32-esp-elf" "linux-amd64 linux-armel linux-i686 macos win32 win64"
     - popd
