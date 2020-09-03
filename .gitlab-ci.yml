@@ -358,7 +358,7 @@ esp32s3_lin_armel:
   variables:
     GIT_STRATEGY: none
     PLATFORM_NAME: "linux-amd64"
-    ESP_COMPILER_TESTS_BRANCH: "-b esp-2020r3-branch"
+    ESP_COMPILER_TESTS_BRANCH: "-b esp-2020r3"
   after_script:
     - source citools/import_functions
     - cit_rm ${CONF_TARGET}
