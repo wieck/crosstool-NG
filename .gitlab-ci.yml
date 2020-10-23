@@ -91,7 +91,8 @@ before_script:
 .package_toolchain: &package_toolchain |
   mkdir -p dist
   pushd builds
-  rm -f ${CONF_TARGET}/build.log.bz2
+  rm -f ../build.log
+  mv ${CONF_TARGET}/build.log.bz2 ..
   ${ARCHIVE_TOOL} ${ARCHIVE_NAME} ${CONF_TARGET}/
   mv ${ARCHIVE_NAME} ../dist/
   echo "${ARCHIVE_NAME}" > ../dist/file_${PLATFORM_NAME}_${CONF_TARGET}
@@ -104,13 +105,14 @@ before_script:
   artifacts:
     paths:
       - .config
-      - build.log
+      # suggest you use `bzless` tool to easily read this log
+      - build.log.bz2
       - dist
     when: always
     expire_in: 6 weeks
   after_script:
     # save artifacts in any case (both failure or success)
-    - git add -f dist build.log .config
+    - git add -f dist build.log.bz2 .config
     - git clean -d -x -f -f
 
 .build_template_linux:
